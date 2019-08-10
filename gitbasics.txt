@@ -1,5 +1,0 @@
-cloning the repo(terminal): git clone https://www.github.com/Luke32G/Atlas.git
-pulling(must be in the directory, this gets the most recent version): git pull
-add all: git add .
-commit: git commit -m "commit name here"
-push(updates the repo): git push
