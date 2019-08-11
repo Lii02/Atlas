@@ -40,8 +40,8 @@ all: ../../ext4/kernel.sys
 #                                          ||                                  ||
 #                                          ||                                  ||
 # Add dependencies here                    \/          ...and here...          \/
-kernel.elf: kernel.o modules/kernel_init.o modules/atlas_std.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/kernel_init.o modules/atlas_std.o
+kernel.elf: kernel.o modules/kernel_init.o modules/atlas_std.o modules/vga.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/kernel_init.o modules/atlas_std.o modules/vga.o
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
@@ -51,3 +51,6 @@ modules/kernel_init.o: modules/kernel_init.c
 
 modules/atlas_std.o: modules/atlas_std.c
 	$(CC) $(CFLAGS) -o modules/atlas_std.o -c modules/atlas_std.c
+
+modules/vga.o: modules/vga.c
+	$(CC) $(CFLAGS) -o modules/vga.o -c modules/vga.c
