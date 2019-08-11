@@ -1,3 +1,4 @@
+#include "atlas_std.h"
 
 void start_kernel()
 {
