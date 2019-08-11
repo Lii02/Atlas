@@ -40,11 +40,11 @@ all: ../../ext4/kernel.sys
 #                                          ||                                  ||
 #                                          ||                                  ||
 # Add dependencies here                    \/          ...and here...          \/
-kernel.elf: kernel.o modules/kernel_init.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/kernel_init.o
+kernel.elf: kernel.o modules/kernel_init.o module/atlas_std.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/kernel_init.o module/atlas_std.o
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
 
-modules/kernel_init.o: modules/kernel_init.c
-	$(CC) $(CFLAGS) -o modules/kernel_init.o -c modules/kernel_init.c
+modules/kernel_init.o: modules/kernel_init.c module/atlas_std.c
+	$(CC) $(CFLAGS) -o modules/kernel_init.o -c modules/kernel_init.c module/atlas_std.c
