@@ -26,7 +26,15 @@ boot:				# Primary bootloader boot funcion
 	
 skip_boot_repair:		# Location to skip boot repair
 	mov bootdev,dl			# Load boot device into memory
+	lea ax,superblock		# Load address of superblock label into AX
+	mov sector_adr,ax		# Store superblock address into destination offset
+	call read_disk			# Read the disk using the read packet
 	
+	mov ax,[offset superblock+56]	# Read the 56th byte of superblock (verification ID)
+	cmp ax,0xEF53			# Does this byte match ext2 verification ID?
+	jne fatal_disk_err		# If not, handle fatal disk error
+	
+	jmp $				# Still working on bootloader
 
 # ========================================================================
 # Initial bootloader BIOS subroutines
@@ -53,6 +61,7 @@ read_disk:			# Performs a BIOS disk read using packet specified at read_pckt
 	mov dl,bootdev			# Load device 0 into DL (or whichever device is at 0x80)
 	mov ah,0x42			# Set BIOS subinterrupt routine for extensive disk reading
 	int 0x13			# Execute BIOS disk service interrupt routine
+	jc fatal_disk_err		# Is carry flag set (set on error)? If so, handle disk error
 	popa				# Restore all registers from the stack
 	ret				# Return to call location
 .endfunc
