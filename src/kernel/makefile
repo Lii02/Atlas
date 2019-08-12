@@ -29,10 +29,10 @@ clear:
 	$(RM) -f *.elf
 	$(RM) -f modules/*.o
 
-all: ../../ext4/kernel.sys
+all: ../../ext2/kernel.sys
 
-../../ext4/kernel.sys: kernel.elf
-	objcopy -O binary kernel.elf ../../ext4/kernel.sys
+../../ext2/kernel.sys: kernel.elf
+	objcopy -O binary kernel.elf ../../ext2/kernel.sys
 
 # IMPORTANT! Add all new module C/S files to this dependency list and to the compile list
 # on the line below.

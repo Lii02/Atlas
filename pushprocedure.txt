@@ -1,4 +1,0 @@
-sudo bash fullbuild.sh
-git add .
-git commit -m "Name"
-git push
