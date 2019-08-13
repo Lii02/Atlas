@@ -26,15 +26,45 @@ boot:				# Primary bootloader boot funcion
 	
 skip_boot_repair:		# Location to skip boot repair
 	mov bootdev,dl			# Load boot device into memory
-	lea ax,superblock		# Load address of superblock label into AX
+	lea ax,disk_buffer		# Load address of superblock label into AX
 	mov sector_adr,ax		# Store superblock address into destination offset
 	call read_disk			# Read the disk using the read packet
 	
-	mov ax,[offset superblock+56]	# Read the 56th byte of superblock (verification ID)
+	mov ax,[offset disk_buffer+56]	# Read the 56th byte of superblock (verification ID)
 	cmp ax,0xEF53			# Does this byte match ext2 verification ID?
 	jne fatal_disk_err		# If not, handle fatal disk error
 	
-	jmp $				# Still working on bootloader
+	lea bx,[offset disk_buffer+32]	# Load address of blocks_per_block_group into BX
+	call load_i32			# Load that value into EAX
+	mov bx,offset block_qty		# Set BX to block_qty variable location
+	call store_i32			# Store value that was in EAX
+	
+	lea bx,[offset disk_buffer+40]	# Load address of inodes_per_block_group into BX
+	call load_i32			# Load the value into EAX
+	mov bx,offset inode_qty		# Set BX to inode_qty varible location
+	call store_i32			# Store value that was in EAX
+	
+	lea bx,[offset disk_buffer+24]	# Load address of log2(block_size)-10 into BX
+	call load_i32			# Load that value into EAX
+	shl eax,10			# Shift left by 1024 to get actual block size
+	mov bx,offset block_size	# Set BX to block_size variable location
+	call store_i32			# Store block size that was in EAX
+
+# ========================================================================
+# Primary filesystem routines
+
+.func read_inode		# Function: read_inode
+read_inode:			# Reads an inode into memory with index ECX
+	# Calculate block group containing an inode by:
+	# block_group = (inode_index - 1) / inodes_per_group
+	
+	mov eax,ecx		# Load inode index into EAX
+	sub eax,1		# Subtract 1 from EAX
+	mov ebx,inode_qty	# Load inodes per group into EBX
+	mov edx,0		# Make sure that there is no segment during division (EDX:EAX)
+	div ebx			# Divide EAX by EBX and store result in EAX
+	
+	
 
 # ========================================================================
 # Initial bootloader BIOS subroutines
@@ -66,6 +96,26 @@ read_disk:			# Performs a BIOS disk read using packet specified at read_pckt
 	ret				# Return to call location
 .endfunc
 
+.func store_i32			# Function: store_i32 (uses little-endian addressing)
+store_i32:			# Stores a 32-bit integer in EAX to memory location 7C00:BX
+	push ax				# Preserve the value of AX (Cannot push 32-bit registers)
+	mov [bx],ax			# Load low end of EAX into memory location
+	shr eax,2			# Shift EAX to the right (get high end into AX)
+	mov [bx+2],ax			# Load high end into memory location + 2
+	shl eax,2			# Restore the high end of EAX
+	pop ax				# Restore the low end of EAX
+	ret				# Return to call location
+.endfunc
+
+.func load_i32			# Function: load_i32 (uses little-endian addressing)
+load_i32:			# Loads a 32-bit integer into EAX from memory location 7C00:BX
+	xor eax,eax			# Set AX equal to 0
+	mov ax,[bx+2]			# Load the high end of integer into AX
+	shl eax,2			# Shift AX into high end of EAX
+	mov ax,[bx]			# Load low end of integer ino AX
+	ret				# Return to call location
+.endfunc
+
 fatal_disk_err:			# Prints a fatal disk error message and reboots
 	lea si,disk_err			# Load message into string pointer
 	call puts			# Print message to screen
@@ -81,6 +131,16 @@ reboot:				# Reboots the (virtual) machine
 # Boot device data
 
 bootdev:	.byte 0x0		# Stores drive number (BIOS stores it in DL)
+
+block_qty:	.word 0x0		# Number of blocks per block group
+		.word 0x0		# Value is a 4 byte (32 bit) integer
+inode_qty:	.word 0x0		# Number of inodes per block group
+		.word 0x0		# Value is a 4 byte (32 bit) integer
+block_size:	.word 0x0		# Size (in bytes) of each block
+		.word 0x0		# Value is a 4 byte (32 bit) integer
+
+# ========================================================================
+# Device read packet
 
 read_pckt:	.byte 0x10		# Data packet for BIOS to read superblock (size of pckt is 16)
 		.byte 0x0		# Unused (always 0)
@@ -105,7 +165,7 @@ disk_err:	.asciz "atlas: Fatal disk read error"
 .fill (510-(.-main)), 1, 0		# Pad unused bootloader space with 0s (up to 510 bytes)
 bootSignature: .int 0xAA55		# Set last to bytes of bootloader to 55AA (boot signature)
 
-superblock:				# Label at which the superblock is loaded into memory
+disk_buffer:				# Label at which all disk reads are loaded into memory
 
 # ========================================================================
 # End of Atlas Initial Bootloader v1.0
