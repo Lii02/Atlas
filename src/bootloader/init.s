@@ -49,6 +49,16 @@ skip_boot_repair:		# Location to skip boot repair
 	shl eax,10			# Shift left by 1024 to get actual block size
 	mov bx,offset block_size	# Set BX to block_size variable location
 	call store_i32			# Store block size that was in EAX
+	
+	lea bx,[offset disk_buffer+76]	# Load address of major version into BX
+	call load_i32			# Load value into EAX
+	cmp eax,0			# Is this a version 0 ext2 filesystem?
+	je skip_inode_cfg		# If so, skip inode configuration stage
+	
+	mov ax,[offset disk_buffer+88]	# Load custom inode size into AX
+	mov inode_size,ax		# Store custom inode size into variable location
+skip_inode_cfg:			# Jump point to skip custom inode configuration stage
+	jmp $				# Still working on bootloader
 
 # ========================================================================
 # Primary filesystem routines
@@ -58,13 +68,37 @@ read_inode:			# Reads an inode into memory with index ECX
 	# Calculate block group containing an inode by:
 	# block_group = (inode_index - 1) / inodes_per_group
 	
-	mov eax,ecx		# Load inode index into EAX
-	sub eax,1		# Subtract 1 from EAX
-	mov ebx,inode_qty	# Load inodes per group into EBX
-	mov edx,0		# Make sure that there is no segment during division (EDX:EAX)
-	div ebx			# Divide EAX by EBX and store result in EAX
+	mov eax,ecx			# Load inode index into EAX
+	sub eax,1			# Subtract 1 from EAX
+	mov ebx,inode_qty		# Load inodes per group into EBX
+	mov edx,0			# Make sure that there is no segment during division (EDX:EAX)
+	div ebx				# Divide EAX by EBX and store result in EAX
+	mov esi,eax			# Temporarily preserve EAX in ESI
 	
+	call read_descriptor		# Read the descriptor of the given block group
+	mov eax,esi			# Restore original value of EAX
 	
+.endfunc
+
+.func read_descriptor		# Function: read_descriptor
+read_descriptor:		# Reads the block group descriptor into memory until block group EAX
+	inc eax				# Make sure to read through block group entry, not up to it
+	mov sector_lba,0x4		# Table begins at the sector #4
+	mov ebx,32			# Each table entry is 32 bytes
+	mul ebx				# Multiply by sector count to get number of bytes to read
+	
+	xor edx,edx			# Make sure that EDX is 0 so we don't have a segment
+	mov ebx,512			# Each sector is 512 bytes
+	div ebx				# Divide byte count by sector length to get sector count
+	cmp edx,0			# Is there no remainder?
+	je _read_descriptor_skip	# If so, skip rounding up process
+	
+	inc eax				# Round up EAX
+_read_descriptor_skip:		# Jump point to skip the rounding up process
+	mov sector_qty,ax		# Load number of sectors to read into packet
+	call read_disk			# Read disk
+	ret				# Return to call location
+.endfunc
 
 # ========================================================================
 # Initial bootloader BIOS subroutines
@@ -138,6 +172,7 @@ inode_qty:	.word 0x0		# Number of inodes per block group
 		.word 0x0		# Value is a 4 byte (32 bit) integer
 block_size:	.word 0x0		# Size (in bytes) of each block
 		.word 0x0		# Value is a 4 byte (32 bit) integer
+inode_size:	.word 128		# Size of each inode (default 128)
 
 # ========================================================================
 # Device read packet
