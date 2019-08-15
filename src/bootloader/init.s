@@ -5,7 +5,7 @@
 .code16					# Code runs in 16 bits
 .intel_syntax noprefix			# Use intel syntax instead of AT&T
 .text					# Code segment, not represented as data
-.org 0x0				# Memory offset is specified during assembling
+.org 0x0				# Memory offset is specified during assembling (0x7C00)
 
 .global main				# Main is accessible from BIOS
 
@@ -34,29 +34,39 @@ skip_boot_repair:		# Location to skip boot repair
 	cmp ax,0xEF53			# Does this byte match ext2 verification ID?
 	jne fatal_disk_err		# If not, handle fatal disk error
 	
-	lea bx,[offset disk_buffer+32]	# Load address of blocks_per_block_group into BX
+	lea bx,disk_buffer		# Load address of superblock into BX
+	add bx,32			# Add offset for blocks_per_block group
 	call load_i32			# Load that value into EAX
 	mov bx,offset block_qty		# Set BX to block_qty variable location
 	call store_i32			# Store value that was in EAX
 	
-	lea bx,[offset disk_buffer+40]	# Load address of inodes_per_block_group into BX
+	lea bx,disk_buffer		# Load address of superblock into BX
+	add bx,40			# Add offset for inodes_per_block_group
 	call load_i32			# Load the value into EAX
 	mov bx,offset inode_qty		# Set BX to inode_qty varible location
 	call store_i32			# Store value that was in EAX
 	
-	lea bx,[offset disk_buffer+24]	# Load address of log2(block_size)-10 into BX
+	lea bx,disk_buffer		# Load address of superblock into BX
+	add bx,24			# Add offset for log2(block_size)-10
 	call load_i32			# Load that value into EAX
 	shl eax,10			# Shift left by 1024 to get actual block size
 	mov bx,offset block_size	# Set BX to block_size variable location
 	call store_i32			# Store block size that was in EAX
 	
-	lea bx,[offset disk_buffer+76]	# Load address of major version into BX
+	lea bx,disk_buffer		# Load address of superblock into BX
+	add bx,76			# Add offset for major version
 	call load_i32			# Load value into EAX
 	cmp eax,0			# Is this a version 0 ext2 filesystem?
 	je skip_inode_cfg		# If so, skip inode configuration stage
 	
 	mov ax,[offset disk_buffer+88]	# Load custom inode size into AX
 	mov inode_size,ax		# Store custom inode size into variable location
+	
+	lea bx,disk_buffer		# Load address of superblock into BX
+	add bx,100			# Add offset for supported features
+	call load_i32			# Put supported features list into EAX
+	and eax,0x02			# Is 64-bit file size supported?
+	mov ext_size,al			# Store result in variable
 skip_inode_cfg:			# Jump point to skip custom inode configuration stage
 	jmp $				# Still working on bootloader
 
@@ -76,14 +86,55 @@ read_inode:			# Reads an inode into memory with index ECX
 	mov esi,eax			# Temporarily preserve EAX in ESI
 	
 	call read_descriptor		# Read the descriptor of the given block group
-	mov eax,esi			# Restore original value of EAX
+	mov eax,32			# Load 32 into EAX (32 bytes per block group descriptor)
+	mov ebx,esi			# Load block group ID into EBX
+	mul ebx				# Multiply 32 by block group ID into EAX
+	add eax,offset disk_buffer	# Add offset of disk buffer to EAX
+	add eax,8			# Starting block address of inode table at byte 8 of descriptor
+	mov ebx,[eax]			# Load value into EBX
+	mov eax,ebx			# Store value into EAX
+	
+	call read_bitmap		# Read the inode bitmap into memory
+	mov eax,ecx			# Load inode number into EAX
+	dec eax				# Inode address starts at 1 (subtract to start at 0)
+	mov ebx,inode_size		# Load inode size into EBX
+	mul ebx				# Mutliply inode size by inode index (into EAX)
+	add eax,offset disk_buffer	# Add disk buffer base (EAX now has address to inode)
+	mov esi,eax			# Store address in ESI (pointer register)
+	
+	mov bl,ext_size			# Load extended size support flags into BL
+	cmp bl,0			# Is extended filesize supported?
+	je _read_inode_i386		# If not, skip to 32 bit portion of size loading
+	
+	lea bx,[esi+108]		# Load address of high 32 bits of filesize into BX
+	call load_i32			# Load integer into EAX
+	mov edx,eax			# Store high 32 bits into EDX
+	jmp _read_inode_L0		# We don't want to zero out the high 32 bits
+_read_inode_i386:		# Jump point to zero out high 32 bits of filesize
+	mov edx,0			# Make sure that EDX is zero for division
+_read_inode_L0:			# Jump point to calculate low 32 bits of filesize
+	lea bx,[esi+4]			# Load address of low 32 bits of filesize into BX
+	call load_i32			# Load integer into EAX (total filesize is now EDX:EAX)
+	
+	mov edi,eax			# Preserve low 32 bits of filesize in EDI (EAX will be used)
+	mov bx,offset block_size	# Load address of block_size into BX
+	call load_i32			# Load block size into EAX
+	mov ebx,eax			# Load block size into EBX
+	mov eax,edi			# Restore low 32 bits of filesize from EDI into EAX
+	div ebx				# Divide filesize by block size to get total block count
+	
+	cmp edx,0			# Is there no remainder?
+	je _read_inode_skip		# If so, skip the rounding up process
+	
+	inc eax				# If there is a partial block, we must include that as well
+_read_inode_skip:		# Jump point to skip the rounding up process if it is not necessary
 	
 .endfunc
 
 .func read_descriptor		# Function: read_descriptor
 read_descriptor:		# Reads the block group descriptor into memory until block group EAX
 	inc eax				# Make sure to read through block group entry, not up to it
-	mov sector_lba,0x4		# Table begins at the sector #4
+	mov sector_lba,word ptr 0x4	# Table begins at the sector #4
 	mov ebx,32			# Each table entry is 32 bytes
 	mul ebx				# Multiply by sector count to get number of bytes to read
 	
@@ -97,6 +148,38 @@ read_descriptor:		# Reads the block group descriptor into memory until block gro
 _read_descriptor_skip:		# Jump point to skip the rounding up process
 	mov sector_qty,ax		# Load number of sectors to read into packet
 	call read_disk			# Read disk
+	ret				# Return to call location
+.endfunc
+
+.func read_bitmap		# Function: read_bitmap
+read_bitmap:			# Reads the inode bitmap given a block address (EAX) up to inode (ECX)
+	mov esi,eax			# Temporarily store block address in ESI
+	lea bx,block_size		# Load the address of block_size variable into BX
+	call load_i32			# Load block_size into EAX
+	mov ebx,esi			# Load the block address into EBX
+	mul ebx				# Multiply block address by block size to get byte address
+	
+	xor edx,edx			# Make sure EDX is 0 (so that it doesn't interfere with div)
+	mov ebx,512			# Store 512 in EBX (each sector is 512 bytes)
+	div ebx				# Divide byte address by sector count to get sector number
+	lea bx,sector_lba		# Put address of sector_lba into BX
+	call store_i32			# Store sector number in packet variable for starting sector
+	
+	mov eax,ecx			# Put inode index into EAX
+	xor ebx,ebx			# Zero out high end of EBX
+	mov bx,inode_size		# Put the inode size into BX
+	mul ebx				# Multiply inode size by inode index to get offset from table
+	
+	xor edx,edx			# Make sure EDX is 0 (so that it doesn't interfere with div)
+	mov ebx,512			# Store 512 in EBX (each sector is 512 bytes)
+	div ebx				# Divide table offset by 512 to get sector offset count
+	cmp edx,0			# Is there no remainder?
+	je _read_bitmap_skip		# If so, skip rounding up process
+	
+	inc eax				# Round up (to ensure that the required table index is read)
+_read_bitmap_skip:		# Jump point to skip the rounding up process
+	mov sector_qty,ax		# Load number of sectors to read into the packet
+	call read_disk			# Read the disk
 	ret				# Return to call location
 .endfunc
 
@@ -173,6 +256,7 @@ inode_qty:	.word 0x0		# Number of inodes per block group
 block_size:	.word 0x0		# Size (in bytes) of each block
 		.word 0x0		# Value is a 4 byte (32 bit) integer
 inode_size:	.word 128		# Size of each inode (default 128)
+ext_size:	.byte 0x0		# Is 64-bit file size supported?
 
 # ========================================================================
 # Device read packet
@@ -184,7 +268,7 @@ sector_adr:	.word 0x0		# Destination memory offset
 		.word 0x0		# Destination memory segment (set to 0x7C00 by ORG)
 sector_lba:	.word 0x2		# First sector to read from (specified in LBA)
 		.word 0x0		# Superblock exists after 1024 byte boot sector
-		.word 0x0		# Boot sector occupies LBA 1 & 2
+		.word 0x0		# Boot sector occupies LBA 0 & 1
 		.word 0x0
 
 # ========================================================================
