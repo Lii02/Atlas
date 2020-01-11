@@ -21,7 +21,7 @@
 
 start:							# Called from bootloader; initiates kernel
 	xor eax,eax						# Zero EAX
-	call _start_kernel				# Jump to function in C kernel
+	call kernel_init				# Jump to function in C kernel
 	
 	jmp $							# In the event of kernel exit, hang CPU
 
