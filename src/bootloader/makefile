@@ -21,7 +21,7 @@ clear:
 	$(RM) -f *.elf
 	$(RM) -f *.bin
 
-all: init.bin
+all: init.bin boot.bin
 
 init.bin: init.elf
 	objcopy -O binary -j .text init.elf init.bin
@@ -31,3 +31,12 @@ init.elf: init.o
 
 init.o: init.s
 	$(AS) -o init.o init.s
+
+boot.bin: boot.elf
+	objcopy -O binary -j .text boot.elf ../../bcfs/boot.bin
+
+boot.elf: boot.o
+	$(LD) -o boot.elf boot.o -Ttext 0x8000
+
+boot.o: boot.s
+	$(AS) -o boot.o boot.s

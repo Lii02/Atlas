@@ -1,17 +1,35 @@
-.code32
-.intel_syntax noprefix
-.text
+# ========================================================================
+# Beginning of Atlas Kernel Assembly Link Module v1.0
+# ========================================================================
 
-.global start
+.code32								# Code runs in 32 bits
+.intel_syntax noprefix				# Use intel syntax instead of AT&T
+.text								# Code segment, not represented as data
+.org 0x0							# Memory offset is specified during assembling (0x2000)
 
-start:
-	lea esp,sys_stack
-	call start_kernel
+.global start						# Start is accessible from bootloader
 
-.section .bss
-	.lcomm buff, 0x1000
+# MEMORY MAPPINGS
+# PROCESS               FIRST BYTE		LAST BYTE		SIZE (B)
+# ------------------------------------------------------------------------
+# DESCRIPTOR TABLES		0x0				0x1FFF 			8192 (approx. 1KB)
+# KERNEL				0x2000		 	0xFFFFF			1040383 (approx. 1MB)
+# STACK					0x100000	 	0x1FFFFF 		1048575 (approx. 1MB)
 
-sys_stack:
+# ========================================================================
+# Kernel Entry Point
 
-.section .data
-	sec_id: .ascii "DATA SECTION"
+start:							# Called from bootloader; initiates kernel
+	xor eax,eax						# Zero EAX
+	call _start_kernel				# Jump to function in C kernel
+	
+	jmp $							# In the event of kernel exit, hang CPU
+
+# ========================================================================
+# Kernel Inclusions
+
+# START OF C KERNEL BINARY DIRECTIVE
+
+# ========================================================================
+# End of Atlas Kernel Assembly Link Module v1.0
+# ========================================================================

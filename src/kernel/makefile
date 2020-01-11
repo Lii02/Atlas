@@ -29,10 +29,10 @@ clear:
 	$(RM) -f *.elf
 	$(RM) -f modules/*.o
 
-all: ../../ext2/kernel.sys
+all: ../../bcfs/kernel.sys
 
-../../ext2/kernel.sys: kernel.elf
-	objcopy -O binary kernel.elf ../../ext2/kernel.sys
+../../bcfs/kernel.sys: kernel.elf
+	objcopy -O binary kernel.elf ../../bcfs/kernel.sys
 
 # IMPORTANT! Add all new module C/S files to this dependency list and to the compile list
 # on the line below.
@@ -41,7 +41,7 @@ all: ../../ext2/kernel.sys
 #                                          ||                                  ||
 # Add dependencies here                    \/          ...and here...          \/
 kernel.elf: kernel.o modules/kernel_init.o modules/atlas_std.o modules/vga.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/kernel_init.o modules/atlas_std.o modules/vga.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/kernel_init.o modules/atlas_std.o modules/vga.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s

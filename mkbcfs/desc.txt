@@ -1,0 +1,104 @@
+
+BCFS Volume Format
+
+Datatype: b = block
+[ BOOT SECTOR - 1024 bytes ] [ VOLUME DESCRIPTOR - 1b ] [ INODE TABLE LINK1 - 1b ] [ DATA BLOCKS - Nb ]
+                             BLOCK 0                    BLOCK 1                    BLOCK 2-N
+
+Volume Descriptor Format
+
+All values assumed to be little-endian unless otherwise specified.
+[ Starting ] [  Ending  ] [ Size in ] [                   Field                   ]
+[   Byte   ] [   Byte   ] [  Bytes  ] [                Description                ]
+
+0            1            2           BCFS signature (0xDC75)
+2            5            4           Total number of inodes in the inode table
+6            9            4           Total number of blocks in the filesystem
+10           11           2           Size of each block in the filesystem
+12           13           2           Major version number (used for compatibility)
+14           15           2           Minor version number (combine with major)
+16           19           4           Number of allowed writes before inspection
+20           23           4           Number of writes since last inspection
+24           27           4           POSIX time of filesystem mount
+28           31           4           POSIX time of most recent disk write
+32           35           4           POSIX time of last inspection
+36           37           2           File system state (see flags below)
+38           39           2           Error compensation method (see flags below)
+40           55           16          Volume name (must be terminated by a zero byte)
+56           119          64          Mount directory (must be terminated by a zero byte)
+120          121          2           Size of each inode in the inode table
+122          125          4           Root directory inode index
+126          129          4           Unallocated block inode index
+130          133          4           Bad block inode index
+134          137          4           Total number of unallocated blocks in the filesystem
+138          1023         886         (Reserved)
+
+File System State Flags
+
+[ Value ] [     Field Description     ]
+0x0       File system is clean
+0x1       File system has errors
+
+Error Compensation Method
+
+[ Value ] [     Field Description     ]
+0x0       Ignore error and proceed
+0x1       Mount the disk as read-only
+0x2       Kernel panic / boot failure
+
+Inode Format
+
+All values assumed to be little-endian unless otherwise specified.
+[ Starting ] [  Ending  ] [ Size in ] [                   Field                   ]
+[   Byte   ] [   Byte   ] [  Bytes  ] [                Description                ]
+
+0            1            2           Inode link type (see flags below)
+2            3            2           Allocated type (see flags below)
+4            7            4           Lower 32 bits of filesize
+8            11           4           Upper 32 bits of filesize
+12           15           4           Time of creation (POSIX time)
+16           19           4           Last access time (POSIX time)
+20           23           4           Last modification time (POSIX time)
+24           25           2           User ID (0 for all)
+26           27           2           Inode permissions (see flags below)
+28           31           4           Data block pointer
+32           63           32          Operating system specific information
+
+Inode Link Type
+
+[ Value ] [     Field Description     ]
+0x0       Unallocated inode
+0x1       Data pointer
+0x2       Inode table pointer
+
+Allocated Type
+
+[ Value ] [     Field Description     ]
+0x0       Standard file
+0x1       Directory
+
+Inode Permissions
+
+[ Flag Binary Location ] [     Field Description     ]
+0b0000000000000001       User - read permission
+0b0000000000000010       User - write permission
+0b0000000000000100       User - execute permission
+0b0000000000001000       User - management permission
+0b0000000000010000       Group - read permission
+0b0000000000100000       Group - write permission
+0b0000000001000000       Group - execute permission
+0b0000000010000000       Group - management permission
+0b0000000100000000       Others - read permission
+0b0000001000000000       Others - write permission
+0b0000010000000000       Others - execute permission
+0b0000100000000000       Others - management permission
+
+Directory Entry Format
+
+All values assumed to be little-endian unless otherwise specified.
+[ Starting ] [  Ending  ] [ Size in ] [                   Field                   ]
+[   Byte   ] [   Byte   ] [  Bytes  ] [                Description                ]
+
+0            3            4           Index of inode in inode table
+4            5            2           Length of filename
+6            6+N-1        N           Characters of filename

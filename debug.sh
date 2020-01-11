@@ -3,4 +3,4 @@
 make clear
 make
 make clearsrc
-bash exec.sh
+bochs

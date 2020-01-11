@@ -1,0 +1,13 @@
+display_library: sdl
+megs: 32
+romimage: file=$BXSHARE/BIOS-bochs-latest
+vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
+vga: extension=vbe, update_freq=15
+ata0-master: type=disk, path=img/atlas.img, cylinders=30, heads=4, spt=17
+#ata0-master: type=disk, path=img/atlas.img, cylinders=306, heads=4, spt=17
+boot: disk
+log: bochsout.txt
+mouse: enabled=0
+cpu: ips=15000000
+display_library: sdl, options="gui_debug"
+magic_break: enabled=1
