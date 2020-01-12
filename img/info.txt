@@ -1,2 +1,0 @@
-This folder contains the compiled disk image (.IMG) file for the Atlas OS.
-Can be launched with QEMU to simulate the operating system.
