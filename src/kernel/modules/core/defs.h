@@ -1,5 +1,5 @@
-#ifndef ATLAS_LAYER_H
-#define ATLAS_LAYER_H
+#ifndef DEFS_H
+#define DEFS_H
 
 #define NULL 0x0
 
@@ -16,5 +16,13 @@ typedef unsigned long int uint_64;
 typedef short int int_16;
 typedef int int_32;
 typedef long int int_64;
+
+void outb(uint_16 port, uchar data);
+void outw(uint_16 port, uint_16 data);
+void outl(uint_16 port, uint_32 data);
+
+uchar inb(uint_16 port);
+uint_16 inw(uint_16 port);
+uint_32 inl(uint_16 port);
 
 #endif

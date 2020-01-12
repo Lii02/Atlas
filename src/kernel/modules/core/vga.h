@@ -33,14 +33,29 @@ typedef struct
 } vga_terminal;
 
 void init_terminal(size_t width, size_t height);
-void cl_terminal(vga_color color);
+void cl_terminal(vga_color fg, vga_color bg);
 
 void iputc(char c, vga_color fg, vga_color bg);
 void iputs(string str, vga_color fg, vga_color bg);
+void iputsln(string str, vga_color fg, vga_color bg);
 
 void putc(char c);
 void puts(string str);
+void putsln(string str);
 
 void vga_write(char c, uint_32 x, uint_32 y, vga_color fg, vga_color bg);
+void vga_write_raw(uint_16 value, uint_32 x, uint_32 y);
+uint_16 vga_read(uint_32 x, uint_32 y);
+char vga_read_char(uint_32 x, uint_32 y);
+vga_color vga_read_fg(uint_32 x, uint_32 y);
+vga_color vga_read_bg(uint_32 x, uint_32 y);
+
+void vga_set_cursor(uint_32 x, uint_32 y);
+uint_32 vga_cursor_x(void);
+uint_32 vga_cursor_y(void);
+void vga_enable_cursor(void);
+void vga_disable_cursor(void);
+
+void vga_scroll(uint_32 count);
 
 #endif

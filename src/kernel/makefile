@@ -39,8 +39,8 @@ all: ../../bcfs/kernel.sys
 ../../bcfs/kernel.sys: kernel.elf
 	objcopy -O binary kernel.elf ../../bcfs/kernel.sys
 
-kernel.elf: kernel.o modules/core/kernel_init.o modules/core/string.o modules/core/vga.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/core/kernel_init.o modules/core/string.o modules/core/vga.o -Ttext 0x2000
+kernel.elf: kernel.o modules/core/kernel_init.o modules/core/string.o modules/core/vga.o modules/core/defs.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/core/kernel_init.o modules/core/string.o modules/core/vga.o modules/core/defs.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
@@ -55,6 +55,9 @@ modules/core/atlas_string.o: modules/core/string.c
 
 modules/core/vga.o: modules/core/vga.c
 	$(CC) $(CFLAGS) -o modules/core/vga.o -c modules/core/vga.c
+
+modules/core/defs.o: modules/core/defs.c
+	$(CC) $(CFLAGS) -o modules/core/defs.o -c modules/core/defs.c
 
 # Atlas IO
 
