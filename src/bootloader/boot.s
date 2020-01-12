@@ -49,7 +49,6 @@ boot_main:						# OS Main func, called from bootloader
 	mov ax,0x10						# Set data segments to second GDT selector
 	mov ds,ax						# DS = 0x10
 	mov es,ax						# ES = 0x10
-	mov esp,0x1FFFFF				# Stack grows down from offset 0x1FFFFF
 	
 	jmp exec_kernel					# Execute the kernel
 

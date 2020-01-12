@@ -33,13 +33,14 @@ typedef struct
 } vga_terminal;
 
 void init_terminal(size_t width, size_t height);
+void cl_terminal(vga_color color);
 
 void iputc(char c, vga_color fg, vga_color bg);
-void iputs(string str, size_t length, vga_color fg, vga_color bg);
+void iputs(string str, vga_color fg, vga_color bg);
 
 void putc(char c);
-void puts(string str, size_t length);
+void puts(string str);
 
-void vga_write(char c, int x, int y, vga_color fg, vga_color bg);
+void vga_write(char c, uint_32 x, uint_32 y, vga_color fg, vga_color bg);
 
 #endif

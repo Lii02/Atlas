@@ -9,8 +9,8 @@
 void _kernel_init()
 {
     init_terminal(80, 24);
-	vga_write('A', 0, 0, VGA_LIGHT_GREY, VGA_BLACK);
-    //puts("Atlas OS: by Atlas Team", 23);
+	cl_terminal(VGA_BLACK);
+    puts("Atlas OS: by Atlas Team");
 }
 
 void kernel_clean_up()

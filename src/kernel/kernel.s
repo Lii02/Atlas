@@ -14,16 +14,24 @@
 # ------------------------------------------------------------------------
 # DESCRIPTOR TABLES		0x0				0x1FFF 			8192 (approx. 1KB)
 # KERNEL				0x2000		 	0xFFFFF			1040383 (approx. 1MB)
-# STACK					0x100000	 	0x1FFFFF 		1048575 (approx. 1MB)
 
 # ========================================================================
 # Kernel Entry Point
 
 start:							# Called from bootloader; initiates kernel
-	xor eax,eax						# Zero EAX
+	xor eax,eax						# Set EAX to 0
+	lea esp,sys_stack				# Set stack to the start point of the 4KB stack
 	call _kernel_init				# Jump to function in C kernel
 	
 	jmp $							# In the event of kernel exit, hang CPU
+
+# ========================================================================
+# Kernel .BSS Stack Section
+
+.section .bss					# Stack section
+	.lcomm buff, 0x1000				# Reserve 4KB
+    
+sys_stack:						# Label marks the start of the kernel stack
 
 # ========================================================================
 # Kernel Inclusions
