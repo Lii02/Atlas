@@ -1,69 +1,54 @@
 #include "vga.h"
 
-unsigned int vga_entry_color(vga_color back, vga_color fore)
+static vga_terminal terminal;
+
+static uchar encode_color(vga_color fg, vga_color bg)
 {
-    return fore | back << 4;
+    return fg | bg << 4;
 }
 
-unsigned int vga_entry(uchar c, unsigned int color)
+static uint_16 vga_entry(char c, uchar color)
 {
-    return (unsigned int) c | (unsigned int) color << 8;
+    return (uint_16) c | (uint_16) color << 8;
 }
 
-atlas_vga_terminal terminal_initialize(unsigned int background, unsigned int foreground, size_t width, size_t height)
+void init_terminal(size_t width, size_t height)
 {
-    atlas_vga_terminal terminal;
     terminal.width = width;
     terminal.height = height;
-    terminal.terminal_row = 0;
-    terminal.terminal_column = 0;
-    terminal.terminal_color = vga_entry_color(background, foreground);
-    terminal.terminal_buffer = (unsigned int *) 0xB8000;
-    for (size_t y = 0; y < height; y++) {
-        for (size_t x = 0; x < width; x++) {
-            const size_t index = y * width + x;
-            terminal.terminal_buffer[index] = vga_entry(' ', terminal.terminal_color);
-        }
-    }
-
-    return terminal;
+    terminal.cursor_x = 0;
+    terminal.cursor_y = 0;
 }
 
-void terminal_set_color(atlas_vga_terminal *terminal, unsigned int color)
+void iputc(char c, vga_color fg, vga_color bg)
 {
-    terminal->terminal_color = color;
+	vga_write(c, terminal.cursor_x++, terminal.cursor_y, fg, bg);
+	if(terminal.cursor_x >= terminal.width)
+	{
+		terminal.cursor_y++;
+		terminal.cursor_x = 0;
+	}
 }
 
-void terminal_putentry(atlas_vga_terminal *terminal, char c, unsigned int color, unsigned int x, unsigned int y)
+void iputs(string str, size_t length, vga_color fg, vga_color bg)
 {
-    const unsigned int index = y * terminal->width + x;
-    terminal->terminal_buffer[index] = vga_entry(c, color);
+	int i;
+	for(i = 0 ; i < length ; ++i) iputc(str[i], fg, bg);
 }
 
-void terminal_putchar(atlas_vga_terminal *terminal, char c)
+void putc(char c)
 {
-    terminal_putentry(terminal, c, terminal->terminal_color, terminal->terminal_column, terminal->terminal_row);
-    if (++terminal->terminal_column == terminal->width)
-    {
-        terminal->terminal_column = 0;
-        if (++terminal->terminal_row == terminal->height)
-        terminal->terminal_row = 0;
-    }
+	iputc(c, VGA_LIGHT_GREY, VGA_BLACK);
 }
 
-void terminal_write(atlas_vga_terminal *terminal, atlas_string str, unsigned int size)
+void puts(string str, size_t length)
 {
-    for(unsigned int i = 0; i < size; i++)
-    {
-        terminal_putchar(terminal, str[i]);
-    }
+	iputs(str, length, VGA_LIGHT_GREY, VGA_BLACK);
 }
 
-void terminal_writestring(atlas_vga_terminal *terminal, atlas_string str)
+void vga_write(char c, int x, int y, vga_color fg, vga_color bg)
 {
-    terminal_write(terminal, str, strlen(str));
-}
-
-void free_terminal(atlas_vga_terminal *terminal)
-{
+	uint_32 index = y * terminal.width + x;
+	uint_16* ptr = 0xB8000;
+	ptr[index] = vga_entry(c, encode_color(fg, bg));
 }

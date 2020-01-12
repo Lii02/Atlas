@@ -25,35 +25,33 @@ CFLAGS := -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32
 # therefore don't need to be compiled directly.
 
 # IMPORTANT! Add all new module C/S files to this dependency list and to the compile list
-# on the line below.
-
-#                                          ||                                  ||
-#                                          ||                                  ||
-# Add dependencies here                    \/          ...and here...          \/
+# on the kernel.elf line.
 
 clear:
 	$(RM) -f *.o
 	$(RM) -f *.elf
 	$(RM) -f modules/*.o
+	$(RM) -f modules/core/*.o
+	$(RM) -f modules/io/*.o
 
 all: ../../bcfs/kernel.sys
-
-# Core Atlas kernel
 
 ../../bcfs/kernel.sys: kernel.elf
 	objcopy -O binary kernel.elf ../../bcfs/kernel.sys
 
-kernel.elf: kernel.o modules/core/kernel.o modules/core/atlas_string.o modules/core/vga.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/core/kernel.o modules/core/atlas_string.o modules/core/vga.o
+kernel.elf: kernel.o modules/core/kernel_init.o modules/core/string.o modules/core/vga.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/core/kernel_init.o modules/core/string.o modules/core/vga.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
 
-modules/core/kernel.o: modules/core/kernel.c
-	$(CC) $(CFLAGS) -o modules/core/kernel.o -c modules/core/kernel.c
+# Core Atlas Kernel
 
-modules/core/atlas_string.o: modules/core/atlas_string.c
-	$(CC) $(CFLAGS) -o modules/core/atlas_string.o -c modules/core/atlas_string.c
+modules/core/kernel_init.o: modules/core/kernel_init.c
+	$(CC) $(CFLAGS) -o modules/core/kernel_init.o -c modules/core/kernel_init.c
+
+modules/core/atlas_string.o: modules/core/string.c
+	$(CC) $(CFLAGS) -o modules/core/string.o -c modules/core/string.c
 
 modules/core/vga.o: modules/core/vga.c
 	$(CC) $(CFLAGS) -o modules/core/vga.o -c modules/core/vga.c
