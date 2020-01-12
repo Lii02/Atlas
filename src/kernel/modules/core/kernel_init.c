@@ -15,6 +15,5 @@ void _kernel_init()
 }
 
 void kernel_clean_up()
-{
-    
+{   
 }
