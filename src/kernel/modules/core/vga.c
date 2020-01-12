@@ -54,6 +54,13 @@ void puts(string str)
 	iputs(str, VGA_LIGHT_GREY, VGA_BLACK);
 }
 
+void putsln(string str)
+{
+	iputs(str, VGA_LIGHT_GREY, VGA_BLACK);
+	terminal.cursor_x = 0;
+	terminal.cursor_y += 1;
+}
+
 void vga_write(char c, uint_32 x, uint_32 y, vga_color fg, vga_color bg)
 {
 	uint_32 index = y * terminal.width + x;

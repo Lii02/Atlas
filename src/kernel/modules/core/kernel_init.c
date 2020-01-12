@@ -10,7 +10,7 @@ void _kernel_init()
 {
     init_terminal(80, 24);
 	cl_terminal(VGA_BLACK);
-    puts("Atlas OS: by Atlas Team");
+    putsln("Atlas OS: by Atlas Team");
 }
 
 void kernel_clean_up()

@@ -40,6 +40,7 @@ void iputs(string str, vga_color fg, vga_color bg);
 
 void putc(char c);
 void puts(string str);
+void putsln(string str);
 
 void vga_write(char c, uint_32 x, uint_32 y, vga_color fg, vga_color bg);
 
