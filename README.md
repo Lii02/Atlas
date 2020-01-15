@@ -48,3 +48,6 @@ The operating system itself uses a custom filesystem called BCFS (block-chain fi
 
 ### Developing the Operating System
 All source files for the operating system are located in the 'src' directory, which is subdivided into the 'bootloader' and 'kernel' directory. The bootloader is written in assembly, and can be modified without having to change compile specs. The 'modules' folder in the kernel source directory contains all C files that are compiled for the operating system. If a file is added, the kernel makefile will need to be updated. In the event that another process must be added, the C function that starts the kernel is called `start_kernel(void)` and is located in the folder 'src/kernel/modules/kernel_init.c'.
+
+## Additional Notes
+1. To provide appropriate git messages, please consider running `make clearsrc` to remove all unnecessary object files before pushing to the repository.
