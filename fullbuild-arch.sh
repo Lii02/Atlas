@@ -6,4 +6,4 @@ mkdir -p bcfs
 make clear
 make
 make clearsrc
-bash exec.sh
+bash exec-arch.sh

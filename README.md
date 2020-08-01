@@ -11,7 +11,7 @@ Bochs Packages:
 ```bochs, bochs-sdl, bochs-x```
 
 QEMU Packages:
-```qemu, qemu-i386```
+```qemu, qemu-i386, qemu-x86_64i386```
 
 Compiler and Linker Packages:
 ```ld, gcc, make```
