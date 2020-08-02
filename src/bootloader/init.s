@@ -1,5 +1,5 @@
 # ========================================================================
-# Beginning of Atlas Initial Bootloader v1.0
+# Beginning of Nyx-Atlas Initial Bootloader v1.0
 # ========================================================================
 
 .code16								# Code runs in 16 bits
