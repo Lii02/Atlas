@@ -1,7 +1,7 @@
 #ifndef DEFS_H
 #define DEFS_H
 
-#define NULL 0x0
+#define NULL ((void*)0x0)
 
 #define FALSE 0x0
 #define TRUE 0x1

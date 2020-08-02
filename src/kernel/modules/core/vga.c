@@ -105,13 +105,6 @@ void iputs(string str, vga_color fg, vga_color bg)
 	vga_update_cursor();
 }
 
-void iputsln(string str, vga_color fg, vga_color bg)
-{
-	iputs(str, fg, bg);
-	lnfeed();
-	cret();
-}
-
 void putc(char c)
 {
 	iputc(c, VGA_LIGHT_GREY, VGA_BLACK);
@@ -120,11 +113,6 @@ void putc(char c)
 void puts(string str)
 {
 	iputs(str, VGA_LIGHT_GREY, VGA_BLACK);
-}
-
-void putsln(string str)
-{
-	iputsln(str, VGA_LIGHT_GREY, VGA_BLACK);
 }
 
 void vga_write(char c, uint_32 x, uint_32 y, vga_color fg, vga_color bg)

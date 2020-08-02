@@ -6,6 +6,6 @@
 typedef char* string;
 
 uint_32 strlen(string str);
-string strreplace(string *str, char c0, char c1);
+string strreplace(string* str, char c0, char c1);
 
 #endif
