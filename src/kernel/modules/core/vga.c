@@ -1,25 +1,26 @@
 #include "vga.h"
+#include <atlas/string.h>
 
 static vga_terminal terminal;
 
-static uchar encode_color(vga_color fg, vga_color bg)
+static uint8_t encode_color(vga_color fg, vga_color bg)
 {
     return fg | (bg << 4);
 }
 
-static uint_16 vga_entry(char c, uchar color)
+static uint16_t vga_entry(char c, uint8_t color)
 {
-    return (uint_16) c | ((uint_16) color << 8);
+    return (uint16_t) c | ((uint16_t) color << 8);
 }
 
 static void vga_update_cursor(void)
 {
-	uint_32 pos = terminal.cursor_y * terminal.width + terminal.cursor_x;
+	uint32_t pos = terminal.cursor_y * terminal.width + terminal.cursor_x;
 	
 	outb(0x3D4, 0x0E);
-	outb(0x3D5, (uchar) (pos >> 8));
+	outb(0x3D5, (uint8_t) (pos >> 8));
 	outb(0x3D4, 0x0F);
-	outb(0x3D5, (uchar) pos);
+	outb(0x3D5, (uint8_t) pos);
 }
 
 static void lnfeed(void)
@@ -95,7 +96,7 @@ void iputc(char c, vga_color fg, vga_color bg)
 	vga_update_cursor();
 }
 
-void iputs(string str, vga_color fg, vga_color bg)
+void iputs(char* str, vga_color fg, vga_color bg)
 {
 	int i;
 	for(i = 0 ; i < strlen(str) ; ++i)
@@ -110,58 +111,58 @@ void putc(char c)
 	iputc(c, VGA_LIGHT_GREY, VGA_BLACK);
 }
 
-void puts(string str)
+void puts(char* str)
 {
 	iputs(str, VGA_LIGHT_GREY, VGA_BLACK);
 }
 
-void vga_write(char c, uint_32 x, uint_32 y, vga_color fg, vga_color bg)
+void vga_write(char c, uint32_t x, uint32_t y, vga_color fg, vga_color bg)
 {
 	vga_write_raw(vga_entry(c, encode_color(fg, bg)), x, y);
 }
 
-void vga_write_raw(uint_16 value, uint_32 x, uint_32 y)
+void vga_write_raw(uint16_t value, uint32_t x, uint32_t y)
 {
-	uint_32 index = y * terminal.width + x;
-	uint_16* ptr = 0xB8000;
+	uint32_t index = y * terminal.width + x;
+	uint16_t* ptr = 0xB8000;
 	ptr[index] = value;
 }
 
-uint_16 vga_read(uint_32 x, uint_32 y)
+uint16_t vga_read(uint32_t x, uint32_t y)
 {
-	uint_32 index = y * terminal.width + x;
-	uint_16* ptr = 0xB8000;
+	uint32_t index = y * terminal.width + x;
+	uint16_t* ptr = 0xB8000;
 	return ptr[index];
 }
 
-char vga_read_char(uint_32 x, uint_32 y)
+char vga_read_char(uint32_t x, uint32_t y)
 {
 	return (char) (vga_read(x, y) & 0xFF);
 }
 
-vga_color vga_read_fg(uint_32 x, uint_32 y)
+vga_color vga_read_fg(uint32_t x, uint32_t y)
 {
-	return (uchar) ((vga_read(x, y) >> 8) & 0x0F);
+	return (uint8_t) ((vga_read(x, y) >> 8) & 0x0F);
 }
 
-vga_color vga_read_bg(uint_32 x, uint_32 y)
+vga_color vga_read_bg(uint32_t x, uint32_t y)
 {
-	return (uchar) ((vga_read(x, y) >> 12) & 0x0F);
+	return (uint8_t) ((vga_read(x, y) >> 12) & 0x0F);
 }
 
-void vga_set_cursor(uint_32 x, uint_32 y)
+void vga_set_cursor(uint32_t x, uint32_t y)
 {
 	terminal.cursor_x = x;
 	terminal.cursor_y = y;
 	vga_update_cursor();
 }
 
-uint_32 vga_cursor_x(void)
+uint32_t vga_cursor_x(void)
 {
 	return terminal.cursor_x;
 }
 
-uint_32 vga_cursor_y(void)
+uint32_t vga_cursor_y(void)
 {
 	return terminal.cursor_y;
 }
@@ -181,7 +182,7 @@ void vga_disable_cursor(void)
 	outb(0x3D5, 0x20);
 }
 
-void vga_scroll(uint_32 count)
+void vga_scroll(uint32_t count)
 {
 	int i, y, x;
 	for(i = 0 ; i < count ; ++i)

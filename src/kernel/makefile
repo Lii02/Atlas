@@ -8,7 +8,7 @@ AS := as
 RM := rm
 CC := gcc
 LD := ld
-CFLAGS := -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32
+CFLAGS := -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32 -I../../include
 
 # When adding new module C/S files, add them as entries to the bottom of this file.
 # Use the following templates.
@@ -39,8 +39,8 @@ all: ../../bcfs/kernel.sys
 ../../bcfs/kernel.sys: kernel.elf
 	objcopy -O binary kernel.elf ../../bcfs/kernel.sys
 
-kernel.elf: kernel.o modules/core/kernel_init.o modules/core/string.o modules/core/vga.o modules/core/defs.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/core/kernel_init.o modules/core/string.o modules/core/vga.o modules/core/defs.o -Ttext 0x2000
+kernel.elf: kernel.o modules/core/kernel_init.o modules/core/vga.o modules/core/asm.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/core/kernel_init.o modules/core/vga.o modules/core/asm.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
@@ -50,16 +50,8 @@ kernel.o: kernel.s
 modules/core/kernel_init.o: modules/core/kernel_init.c
 	$(CC) $(CFLAGS) -o modules/core/kernel_init.o -c modules/core/kernel_init.c
 
-modules/core/atlas_string.o: modules/core/string.c
-	$(CC) $(CFLAGS) -o modules/core/string.o -c modules/core/string.c
-
 modules/core/vga.o: modules/core/vga.c
 	$(CC) $(CFLAGS) -o modules/core/vga.o -c modules/core/vga.c
 
-modules/core/defs.o: modules/core/defs.c
-	$(CC) $(CFLAGS) -o modules/core/defs.o -c modules/core/defs.c
-
-# Atlas IO
-
-modules/io/atlas_io.o: modules/io/atlas_io.c
-	$(CC) $(CFLAGS) -o modules/io/atlas_io.o -c modules/io/atlas_io.c
+modules/core/asm.o: modules/core/asm.c
+	$(CC) $(CFLAGS) -o modules/core/asm.o -c modules/core/asm.c
