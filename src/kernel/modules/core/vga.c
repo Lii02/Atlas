@@ -1,5 +1,5 @@
 #include "vga.h"
-#include <atlas/string.h>
+#include <string.h>
 
 static vga_terminal terminal;
 
@@ -83,9 +83,11 @@ void init_terminal(size_t width, size_t height)
 
 void cl_terminal(vga_color fg, vga_color bg)
 {
+	terminal.fg = fg;
+	terminal.bg = bg;
 	for(int x = 0 ; x < terminal.width ; ++x)
 	{
-		for(int y = 0 ; y < terminal.height ; ++y) vga_write(' ', x, y, fg, bg);
+		for(int y = 0 ; y < terminal.height ; ++y) vga_write(' ', x, y, terminal.fg, terminal.bg);
 	}
 	vga_set_cursor(0, 0);
 }
@@ -108,12 +110,12 @@ void iputs(char* str, vga_color fg, vga_color bg)
 
 void putc(char c)
 {
-	iputc(c, VGA_LIGHT_GREY, VGA_BLACK);
+	iputc(c, terminal.fg, terminal.bg);
 }
 
 void puts(char* str)
 {
-	iputs(str, VGA_LIGHT_GREY, VGA_BLACK);
+	iputs(str, terminal.fg, terminal.bg);
 }
 
 void vga_write(char c, uint32_t x, uint32_t y, vga_color fg, vga_color bg)
@@ -196,4 +198,9 @@ void vga_scroll(uint32_t count)
 	
 	if(count > terminal.cursor_y) vga_set_cursor(0, 0);
 	else vga_set_cursor(terminal.cursor_x, terminal.cursor_y - count);
+}
+
+vga_terminal* get_global_vga_terminal()
+{
+	return &terminal;
 }

@@ -8,7 +8,7 @@ AS := as
 RM := rm
 CC := gcc
 LD := ld
-CFLAGS := -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32 -I../../include
+CFLAGS := -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32 -I../../std
 
 # When adding new module C/S files, add them as entries to the bottom of this file.
 # Use the following templates.

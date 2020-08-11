@@ -1,12 +1,7 @@
 #include "asm.h"
 #include "vga.h"
 
-/*
- * Atlas Kernel Main
- * 	- Atlas Team 2020
- */
-
-void _kernel_init()
+void kernel_init()
 {
 	init_terminal(80, 24);
 	cl_terminal(VGA_LIGHT_GREY, VGA_BLACK);

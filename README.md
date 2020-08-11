@@ -51,3 +51,4 @@ All source files for the operating system are located in the 'src' directory, wh
 
 ## Additional Notes
 1. To provide appropriate git messages, please consider running `make clearsrc` to remove all unnecessary object files before pushing to the repository.
+2. If script line ending errors occur, run `dos2unix scriptname`, you must have the `dos2unix` package installed first.

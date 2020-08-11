@@ -21,7 +21,7 @@
 start:							# Called from bootloader; initiates kernel
 	xor eax,eax						# Set EAX to 0
 	lea esp,sys_stack				# Set stack to the start point of the 4KB stack
-	call _kernel_init				# Jump to function in C kernel
+	call kernel_init				# Jump to function in C kernel
 	
 	jmp $							# In the event of kernel exit, hang CPU
 

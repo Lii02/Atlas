@@ -29,6 +29,8 @@ typedef struct
 	size_t height;
 	uint32_t cursor_x;
 	uint32_t cursor_y;
+	vga_color fg;
+	vga_color bg;
 } vga_terminal;
 
 void init_terminal(size_t width, size_t height);
@@ -54,5 +56,7 @@ void vga_enable_cursor(void);
 void vga_disable_cursor(void);
 
 void vga_scroll(uint32_t count);
+
+vga_terminal* get_global_vga_terminal();
 
 #endif
