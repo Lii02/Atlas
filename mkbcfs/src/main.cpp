@@ -30,12 +30,13 @@ int main(int argc, char** argv)
    {
       stringstream ss;
       ss << experimental::filesystem::current_path().u8string() << "/" << string(argv[2]);
+
       stringstream ss0;
       ss0 << experimental::filesystem::current_path().u8string() << "/" << string(argv[1]);
       
       string mntdir = ss.str();
       string diskimg = ss0.str();
-      uint_64 volume_size = stoul(string(argv[3]),nullptr,0);
+      uint_64 volume_size = stoul(string(argv[3]), nullptr, 0);
       
       init_volume_params(volume_size, mntdir);
       

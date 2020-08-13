@@ -32,15 +32,14 @@ clear:
 	$(RM) -f *.elf
 	$(RM) -f modules/*.o
 	$(RM) -f modules/core/*.o
-	$(RM) -f modules/io/*.o
 
 all: ../../bcfs/kernel.sys
 
 ../../bcfs/kernel.sys: kernel.elf
 	objcopy -O binary kernel.elf ../../bcfs/kernel.sys
 
-kernel.elf: kernel.o modules/core/kernel_init.o modules/core/vga.o modules/core/asm.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/core/kernel_init.o modules/core/vga.o modules/core/asm.o -Ttext 0x2000
+kernel.elf: kernel.o modules/core/kernel_init.o modules/core/vga.o modules/core/asm.o modules/core/keyboard.o modules/core/alloc.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/core/kernel_init.o modules/core/vga.o modules/core/asm.o modules/core/keyboard.o modules/core/alloc.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
@@ -55,3 +54,9 @@ modules/core/vga.o: modules/core/vga.c
 
 modules/core/asm.o: modules/core/asm.c
 	$(CC) $(CFLAGS) -o modules/core/asm.o -c modules/core/asm.c
+
+modules/core/keyboard.o: modules/core/keyboard.c
+	$(CC) $(CFLAGS) -o modules/core/keyboard.o -c modules/core/keyboard.c
+
+/core/alloc.o: modules/core/alloc.c
+	$(CC) $(CFLAGS) -o modules/core/alloc.o -c modules/core/alloc.c
