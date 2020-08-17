@@ -14,12 +14,12 @@ CFLAGS := -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32 -I../
 # Use the following templates.
 
 # For assembly (.s) files:
-# modules/FILENAME.o: modules/FILENAME.s
-# 	$(AS) --32 -o modules/FILENAME.o modules/FILENAME.s
+# FILENAME.o: FILENAME.s
+# 	$(AS) --32 -o FILENAME.o FILENAME.s
 
 # For C (.c) files:
-# modules/FILENAME.o: modules/FILENAME.c
-#	$(CC) $(CFLAGS) -o modules/FILENAME.o -c modules/FILENAME.c
+# FILENAME.o: FILENAME.c
+#	$(CC) $(CFLAGS) -o FILENAME.o -c FILENAME.c
 
 # Header (.h) files contain only declarations and are included by C files and
 # therefore don't need to be compiled directly.
@@ -30,33 +30,51 @@ CFLAGS := -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32 -I../
 clear:
 	$(RM) -f *.o
 	$(RM) -f *.elf
-	$(RM) -f modules/*.o
-	$(RM) -f modules/core/*.o
+	$(RM) -f *.o
+	$(RM) -f core/*.o
+	$(RM) -f cpu/*.o
+	$(RM) -f drivers/*.o
 
 all: ../../bcfs/kernel.sys
 
 ../../bcfs/kernel.sys: kernel.elf
 	objcopy -O binary kernel.elf ../../bcfs/kernel.sys
 
-kernel.elf: kernel.o modules/core/kernel_init.o modules/core/vga.o modules/core/asm.o modules/core/keyboard.o modules/core/alloc.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o modules/core/kernel_init.o modules/core/vga.o modules/core/asm.o modules/core/keyboard.o modules/core/alloc.o -Ttext 0x2000
+kernel.elf: kernel.o core/kernel_init.o core/vga.o core/asm.o core/mem.o cpu/interrupts.o cpu/idt.o cpu/isr.o cpu/timer.o drivers/keyboard.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o core/kernel_init.o core/vga.o core/asm.o core/mem.o cpu/interrupts.o cpu/idt.o cpu/isr.o cpu/timer.o drivers/keyboard.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
 
 # Core Atlas Kernel
 
-modules/core/kernel_init.o: modules/core/kernel_init.c
-	$(CC) $(CFLAGS) -o modules/core/kernel_init.o -c modules/core/kernel_init.c
+core/kernel_init.o: core/kernel_init.c
+	$(CC) $(CFLAGS) -o core/kernel_init.o -c core/kernel_init.c
 
-modules/core/vga.o: modules/core/vga.c
-	$(CC) $(CFLAGS) -o modules/core/vga.o -c modules/core/vga.c
+core/vga.o: core/vga.c
+	$(CC) $(CFLAGS) -o core/vga.o -c core/vga.c
 
-modules/core/asm.o: modules/core/asm.c
-	$(CC) $(CFLAGS) -o modules/core/asm.o -c modules/core/asm.c
+core/asm.o: core/asm.c
+	$(CC) $(CFLAGS) -o core/asm.o -c core/asm.c
 
-modules/core/keyboard.o: modules/core/keyboard.c
-	$(CC) $(CFLAGS) -o modules/core/keyboard.o -c modules/core/keyboard.c
+/core/alloc.o: core/mem.c
+	$(CC) $(CFLAGS) -o core/mem.o -c core/mem.c
 
-/core/alloc.o: modules/core/alloc.c
-	$(CC) $(CFLAGS) -o modules/core/alloc.o -c modules/core/alloc.c
+# Atlas CPU classes
+
+cpu/interrupts.o: cpu/interrupts.s
+	$(AS) --32 -o cpu/interrupts.o cpu/interrupts.s
+
+cpu/isr.o: cpu/isr.c
+	$(CC) $(CFLAGS) -o cpu/isr.o -c cpu/isr.c
+
+cpu/idt.o: cpu/idt.c
+	$(CC) $(CFLAGS) -o cpu/idt.o -c cpu/idt.c
+
+cpu/timer.o: cpu/timer.c
+	$(CC) $(CFLAGS) -o cpu/timer.o -c cpu/timer.c
+
+# Atlas driver classes
+
+drivers/keyboard.o: drivers/keyboard.c
+	$(CC) $(CFLAGS) -o drivers/keyboard.o -c drivers/keyboard.c

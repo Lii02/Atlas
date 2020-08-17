@@ -56,6 +56,7 @@ void vga_enable_cursor(void);
 void vga_disable_cursor(void);
 
 void vga_scroll(uint32_t count);
+void clear_terminal();
 
 vga_terminal* get_global_vga_terminal();
 

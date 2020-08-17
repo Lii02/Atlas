@@ -200,6 +200,20 @@ void vga_scroll(uint32_t count)
 	else vga_set_cursor(terminal.cursor_x, terminal.cursor_y - count);
 }
 
+void clear_terminal()
+{
+	int x, y;
+	for(x = 0; x < terminal.width; x++)
+	{
+		for(y = 0; y < terminal.height; y++)
+		{
+			vga_write(' ', x, y, terminal.fg, terminal.bg);
+		}	
+	}
+	terminal.cursor_x = 0;
+	terminal.cursor_y = 0;
+}
+
 vga_terminal* get_global_vga_terminal()
 {
 	return &terminal;

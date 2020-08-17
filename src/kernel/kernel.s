@@ -19,9 +19,9 @@
 # Kernel Entry Point
 
 start:							# Called from bootloader; initiates kernel
-	xor eax,eax						# Set EAX to 0
-	lea esp,sys_stack				# Set stack to the start point of the 4KB stack
-	call kernel_init				# Jump to function in C kernel
+	xor eax, eax						# Set EAX to 0
+	lea esp, sys_stack				# Set stack to the start point of the 4KB stack
+	call kernel_main				# Jump to function in C kernel
 	jmp $							# In the event of kernel exit, hang CPU
 
 # ========================================================================
