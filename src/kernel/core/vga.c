@@ -1,7 +1,6 @@
 #include "vga.h"
-#include <string.h>
 
-static vga_terminal terminal;
+vga_terminal terminal;
 
 static uint8_t encode_color(vga_color fg, vga_color bg)
 {

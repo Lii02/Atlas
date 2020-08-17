@@ -34,14 +34,15 @@ clear:
 	$(RM) -f core/*.o
 	$(RM) -f cpu/*.o
 	$(RM) -f drivers/*.o
+	$(RM) -f shell/*.o
 
 all: ../../bcfs/kernel.sys
 
 ../../bcfs/kernel.sys: kernel.elf
 	objcopy -O binary kernel.elf ../../bcfs/kernel.sys
 
-kernel.elf: kernel.o core/kernel_init.o core/vga.o core/asm.o core/mem.o cpu/interrupts.o cpu/idt.o cpu/isr.o cpu/timer.o drivers/keyboard.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o core/kernel_init.o core/vga.o core/asm.o core/mem.o cpu/interrupts.o cpu/idt.o cpu/isr.o cpu/timer.o drivers/keyboard.o -Ttext 0x2000
+kernel.elf: kernel.o core/kernel_init.o core/vga.o core/asm.o core/mem.o cpu/interrupts.o cpu/idt.o cpu/isr.o cpu/timer.o drivers/keyboard.o shell/shell.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o core/kernel_init.o core/vga.o core/asm.o core/mem.o cpu/interrupts.o cpu/idt.o cpu/isr.o cpu/timer.o drivers/keyboard.o shell/shell.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
@@ -78,3 +79,8 @@ cpu/timer.o: cpu/timer.c
 
 drivers/keyboard.o: drivers/keyboard.c
 	$(CC) $(CFLAGS) -o drivers/keyboard.o -c drivers/keyboard.c
+
+# Atlas shell classes
+
+shell/shell.o: shell/shell.c
+	$(CC) $(CFLAGS) -o shell/shell.o -c shell/shell.c

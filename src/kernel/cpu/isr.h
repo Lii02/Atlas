@@ -81,7 +81,7 @@ struct registers_t
 void isr_install();
 void isr_handler(struct registers_t r);
 
-typedef void (*isr_t)(registers_t);
+typedef void (*isr_t)(struct registers_t);
 void register_interrupt_handler(uint8_t n, isr_t handler);
 
 #endif
