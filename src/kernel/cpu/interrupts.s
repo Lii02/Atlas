@@ -345,7 +345,7 @@ irq4:
 	jmp irq_common_stub
 
 irq5:
-	cli
+    cli
 	push 5
 	push 37
 	jmp irq_common_stub

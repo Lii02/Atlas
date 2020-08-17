@@ -33,20 +33,22 @@
 #define KEYRBRKT_PRESSED 0x1B
 #define KEYENTER_PRESSED 0x1C
 
-#define CAPS_LOCK_FLAG (1 << 0)
-#define SCROLL_LOCK_FLAG (1 << 1)
-#define NUM_LOCK_FLAG (1 << 2)
+#define NO_LOCK_FLAG (1 << 0)
+#define CAPS_LOCK_FLAG (1 << 2)
+#define SCROLL_LOCK_FLAG (1 << 2)
+#define NUM_LOCK_FLAG (1 << 3)
 
-#define MAX_KEYBOARD_INSTANCES 0xFF
+#define MAX_KEYBOARD_INSTANCES 0x10
 
 struct keyboard_t
 {
     uint8_t current_key;
     uint8_t lock_flag;
     uint8_t id;
-    bool used; 
+    void(*key_callback)(uint8_t, uint8_t);
 };
 
-struct keyboard_t init_keyboard_driver(uint8_t id);
+struct keyboard_t* init_keyboard_driver(uint8_t id, void(*key_callback)(uint8_t, uint8_t));
+void set_current_keyboard(uint8_t i);
 
 #endif
