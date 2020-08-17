@@ -37,19 +37,6 @@ define_GDT:						# Define Global-Descriptor-Table
 	ret								# Return to call location
 .endfunc
 
-.func define_IDT				# Function: define_IDT
-define_IDT:						# Define Interrupt-Descriptor-Table
-	mov ax,0						# Load AX to 0
-	mov es,ax						# Store 0 in ES as memory location
-	mov di,0x0						# Set memory offset to 0h (800h is GDT)
-	
-	# NULL INTERRUPT TABLE
-	mov cx,0x800					# Set rep counter to 2048
-	rep stosb						# Load zeros into table
-	
-	ret								# Return to call location
-.endfunc
-
 # ========================================================================
 # End of Atlas Second-Stage G/I Descriptor Module v1.0
 # ========================================================================

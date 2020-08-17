@@ -39,8 +39,6 @@ boot_main:						# OS Main func, called from bootloader
 	
 	call define_GDT					# Create global descriptor table
 	lgdt gdt_r						# Link GDT to the processor
-	call define_IDT					# Create interrupt descriptor table
-	lidt idt_r						# Link IDT to the processor
 	
 	cli								# Disable interrupts
 	call enable_pm					# Enable protected mode

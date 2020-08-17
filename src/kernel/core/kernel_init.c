@@ -9,7 +9,6 @@ void kernel_main()
 {
 	isr_install();
 	init_keyboard();
-	init_timer(100);
 
 	init_terminal(80, 24);
 	cl_terminal(VGA_LIGHT_GREY, VGA_BLACK);
