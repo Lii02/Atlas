@@ -1,8 +1,8 @@
 #ifndef DEFS_H
 #define DEFS_H
 
-#include <stdint.h>
-#include <stdlib.h>
+#include "../std/stdint.h"
+#include "../std/stdlib.h"
 
 void outb(uint16_t port, uint8_t data);
 void outw(uint16_t port, uint16_t data);

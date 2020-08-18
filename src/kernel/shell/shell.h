@@ -1,11 +1,12 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#include <stdint.h>
-#include <stdlib.h>
+#include "../std/stdint.h"
+#include "../std/stdlib.h"
+#include "../std/stdbool.h"
 #include "../drivers/keyboard.h"
 
-#define MAX_COMMAND_LENGTH 0x100
+#define MAX_COMMAND_LENGTH 256
 
 struct shell_t
 {
@@ -13,8 +14,8 @@ struct shell_t
     uint32_t min_cursor_pos;
     uint8_t current_key;
     struct keyboard_t* kb;
-    char* submitted_command;
     uint32_t id;
+    bool debug;
     char cmd[MAX_COMMAND_LENGTH];
 };
 

@@ -1,5 +1,5 @@
 #include "keyboard.h"
-#include <stdint.h>
+#include "../std/stdint.h"
 #include "../core/asm.h"
 #include "../cpu/isr.h"
 

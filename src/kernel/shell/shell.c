@@ -1,5 +1,5 @@
 #include "shell.h"
-#include <string.h>
+#include "../std/string.h"
 #include "../core/vga.h"
 #include "../core/mem.h"
 
@@ -16,6 +16,7 @@ struct shell_t* create_shell(uint32_t id, struct keyboard_t* kb)
     shells[id].id = id;
     shells[id].kb = kb;
     shells[id].working_dir = "root/";
+    shells[id].debug = false;
     shells[id].min_cursor_pos = 0;
     shell_reset_cmd();
     return &shells[id];
@@ -44,6 +45,7 @@ void shell_reset_cmd()
 
 void start_new_shell_line()
 {
+    shells[current_shell].min_cursor_pos = 0;
     shell_reset_cmd();
     print_shell_prefix(current_shell);
 }
@@ -460,7 +462,10 @@ void shell_key_callback(uint8_t key, uint8_t flag)
             }
             break;
         case KEY_BACKSPACE_PRESSED:
-            push_char_to_input(shells[current_shell].cmd, '\b');
+            if(terminal.cursor_x > shells[current_shell].min_cursor_pos)
+            {
+                push_char_to_input(shells[current_shell].cmd, '\b');
+            }
             break;
         case KEY_ENTER_PRESSED:
             puts("\n\r");
@@ -472,28 +477,36 @@ void shell_key_callback(uint8_t key, uint8_t flag)
 
 void set_current_shell(uint32_t id)
 {
-    current_shell = 0;
+    current_shell = id;
 }
 
 void push_char_to_input(char* str, char c)
 {
     int len = strlen(str);
     str[len] = c;
+    str[len + 1] = '\0';
     putc(c);
 }
 
 void shell_interpret_command()
 {
     char* cmd = shells[current_shell].cmd;
-    if(strcmp(cmd, "info") == 0)
+    if(strcmp(cmd, "clear") == 0)
     {
-        puts("Atlas OS by Atlas Team");
-        puts("\n\r");
+        vga_scroll(terminal.cursor_y);
+    }
+    else if(strcmp(cmd, "debug on") == 0)
+    {
+        shells[current_shell].debug = true;
+    }
+    else if(strcmp(cmd, "debug off") == 0)
+    {
+        shells[current_shell].debug = false;
     }
     else
     {
-        puts("Unknown command: ");
+        puts("Unknown command: \"");
         puts(cmd);
-        puts("\n\r");
+        puts("\"\n\r");
     }
 }

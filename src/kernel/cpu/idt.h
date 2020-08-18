@@ -1,8 +1,8 @@
 #ifndef IDT_H
 #define IDT_H
 
-#include <stdlib.h>
-#include <stdint.h>
+#include "../std/stdlib.h"
+#include "../std/stdint.h"
 
 #define KERNEL_CS 0x8
 

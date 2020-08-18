@@ -1,14 +1,12 @@
 #ifndef ALLOC_H
 #define ALLOC_H
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include "../std/stdlib.h"
+#include "../std/stdint.h"
+#include "../std/stdbool.h"
 
 typedef unsigned int uintptr_t;
 
-void memcpy(uint8_t* src, uint8_t* dest, int32_t bytes);
-void memset(uint8_t* dest, uint8_t val, uint8_t* length);
 void* sbrk(uintptr_t i);
 
 typedef char ALIGN[0x10];

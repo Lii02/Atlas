@@ -8,7 +8,7 @@ AS := as
 RM := rm
 CC := gcc
 LD := ld
-CFLAGS := -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32 -I../../std
+CFLAGS := -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32
 
 # When adding new module C/S files, add them as entries to the bottom of this file.
 # Use the following templates.
@@ -35,17 +35,25 @@ clear:
 	$(RM) -f cpu/*.o
 	$(RM) -f drivers/*.o
 	$(RM) -f shell/*.o
+	$(RM) -f std/*.o
 
 all: ../../bcfs/kernel.sys
 
 ../../bcfs/kernel.sys: kernel.elf
 	objcopy -O binary kernel.elf ../../bcfs/kernel.sys
 
-kernel.elf: kernel.o core/kernel_init.o core/vga.o core/asm.o core/mem.o cpu/interrupts.o cpu/idt.o cpu/isr.o cpu/timer.o drivers/keyboard.o shell/shell.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o core/kernel_init.o core/vga.o core/asm.o core/mem.o cpu/interrupts.o cpu/idt.o cpu/isr.o cpu/timer.o drivers/keyboard.o shell/shell.o -Ttext 0x2000
+kernel.elf: kernel.o std/stdlib.o std/string.o core/kernel_init.o core/vga.o core/asm.o core/mem.o cpu/interrupts.o cpu/idt.o cpu/isr.o cpu/timer.o drivers/keyboard.o shell/shell.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o std/stdlib.o std/string.o core/kernel_init.o core/vga.o core/asm.o core/mem.o cpu/interrupts.o cpu/idt.o cpu/isr.o cpu/timer.o drivers/keyboard.o shell/shell.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
+
+# Atlas STD
+std/stdlib.o: std/stdlib.c
+	$(CC) $(CFLAGS) -o std/stdlib.o -c std/stdlib.c
+	
+std/string.o: std/string.c
+	$(CC) $(CFLAGS) -o std/string.o -c std/string.c
 
 # Core Atlas Kernel
 

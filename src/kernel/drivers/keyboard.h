@@ -1,8 +1,8 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "../std/stdint.h"
+#include "../std/stdbool.h"
 
 #define KEY_ESC_PRESSED 0x1
 #define KEY_1_PRESSED 0x2
