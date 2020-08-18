@@ -20,5 +20,5 @@ void kernel_main()
 
 	struct shell_t* main_shell = create_shell(0, kb);
 
-	print_shell_prefix(0);
+	start_new_shell_line();
 }

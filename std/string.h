@@ -28,7 +28,8 @@ void itoa(int n, char* str, int radix)
 	}
 
     if ((sign = n) < 0) n = -n;
-    do {
+    do
+	{
         str[i++] = n % radix + '0';
     } while ((n /= radix) > 0);
 
@@ -36,11 +37,21 @@ void itoa(int n, char* str, int radix)
     str[i] = '\0';
 
 	int c, j;
-    for (i = strt, j = strlen(str) - 1; i < j; i++, j--) {
+    for (i = strt, j = strlen(str) - 1; i < j; i++, j--)
+	{
         c = str[i];
         str[i] = str[j];
         str[j] = c;
     }
+}
+
+int strcmp(char* str1, char* str2)
+{
+	int i;
+    for (i = 0; str1[i] == str2[i]; i++) {
+        if (str1[i] == '\0') return 0;
+    }
+    return str1[i] - str2[i];
 }
 
 #endif
