@@ -10,30 +10,9 @@ unsigned int strlen(char* str)
 
 void itoa(int n, char* str, int radix)
 {
-	int i, sign, strt;
-	switch(radix)
-	{
-		case 16:
-		{
-			str[0] = '0';
-			str[1] = 'x';
-			i = 2;
-			strt = 2;
-		} break;
-		case 2:
-		{
-			str[0] = '0';
-			str[1] = 'b';
-			i = 2;
-			strt = 2;
-		} break;
-		default:
-		{
-    		i = 0;
-			strt = 0;
-		} break;
-	}
-
+	int i, sign;
+	
+	i = 0;
     if ((sign = n) < 0) n = -n;
     do
 	{
@@ -44,7 +23,7 @@ void itoa(int n, char* str, int radix)
     str[i] = '\0';
 
 	int c, j;
-    for (i = strt, j = strlen(str) - 1; i < j; i++, j--)
+    for (i = 0, j = strlen(str) - 1; i < j; i++, j--)
 	{
         c = str[i];
         str[i] = str[j];
@@ -54,11 +33,18 @@ void itoa(int n, char* str, int radix)
 
 int strcmp(char* str1, char* str2)
 {
-	int i;
-    for (i = 0; str1[i] == str2[i]; i++) {
-        if (str1[i] == '\0') return 0;
+	const unsigned char *s1 = (const unsigned char *) str1;
+	const unsigned char *s2 = (const unsigned char *) str2;
+  	unsigned char c1, c2;
+  	do
+    {
+		c1 = (unsigned char) *s1++;
+		c2 = (unsigned char) *s2++;
+		if (c1 == '\0')
+        	return c1 - c2;
     }
-    return str1[i] - str2[i];
+  	while (c1 == c2);
+	return c1 - c2;
 }
 
 char* strcpy(char* dest, const char* src)
@@ -101,4 +87,17 @@ char* strncat(char* s1, const char* s2, unsigned int n)
 	    s1[len1 + n] = '\0';
     }
     return s1;
+}
+
+char* strncmp(char* str1, char* str2, int n)
+{
+	if (n == 0)
+		return 0;
+	do {
+		if (*str1 != *str2++)
+			return (*(unsigned char *)str1 - *(unsigned char *)--str2);
+		if (*str1++ == 0)
+			break;
+	} while (--n != 0);
+	return 0;
 }

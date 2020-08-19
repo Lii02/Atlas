@@ -80,7 +80,6 @@ struct keyboard_t
 };
 
 struct keyboard_t* init_keyboard_driver(uint8_t id, void(*key_callback)(uint8_t, uint8_t));
-void shell_interpret_command();
 void set_current_keyboard(uint8_t i);
 
 #endif

@@ -24,6 +24,7 @@ struct shell_t* create_shell(uint32_t id, struct keyboard_t* kb)
 
 void print_shell_prefix(uint32_t shell_id)
 {
+    shells[shell_id].min_cursor_pos += terminal.cursor_x;
     char* s1 = "$atlas[";
     puts(s1);
     shells[shell_id].min_cursor_pos += strlen(s1);
@@ -469,7 +470,13 @@ void shell_key_callback(uint8_t key, uint8_t flag)
             break;
         case KEY_ENTER_PRESSED:
             puts("\n\r");
-            shell_interpret_command();
+            bool i = shell_interpret_command();
+            if(!i)
+            {
+                puts("Unknown command: \"");
+                puts(shells[current_shell].cmd);
+                puts("\"\n\r");
+            }
             start_new_shell_line();
             break;
     }
@@ -488,25 +495,23 @@ void push_char_to_input(char* str, char c)
     putc(c);
 }
 
-void shell_interpret_command()
+bool shell_interpret_command()
 {
-    char* cmd = shells[current_shell].cmd;
-    if(strcmp(cmd, "clear") == 0)
+    if(strcmp(shells[current_shell].cmd, "clear") == 0)
     {
         vga_scroll(terminal.cursor_y);
+        return true;
     }
-    else if(strcmp(cmd, "debug on") == 0)
+    else if(strcmp(shells[current_shell].cmd, "debug") == 0)
     {
-        shells[current_shell].debug = true;
+        shells[current_shell].debug = !shells[current_shell].debug;
+        return true;
     }
-    else if(strcmp(cmd, "debug off") == 0)
-    {
-        shells[current_shell].debug = false;
-    }
-    else
-    {
-        puts("Unknown command: \"");
-        puts(cmd);
-        puts("\"\n\r");
-    }
+
+    return false;
+}
+
+void set_working_dir(char* dir)
+{
+    shells[current_shell].working_dir = dir;
 }

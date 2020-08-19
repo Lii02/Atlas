@@ -28,5 +28,7 @@ void start_new_shell_line();
 void shell_key_callback(uint8_t key, uint8_t flag);
 void set_current_shell(uint32_t id);
 void push_char_to_input(char* str, char c);
+bool shell_interpret_command();
+void set_working_dir(char* dir);
 
 #endif
