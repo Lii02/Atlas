@@ -13,7 +13,6 @@ struct shell_t
     char* working_dir;
     uint32_t min_cursor_pos;
     uint8_t current_key;
-    struct keyboard_t* kb;
     uint32_t id;
     bool debug;
     char cmd[MAX_COMMAND_LENGTH];
@@ -21,7 +20,7 @@ struct shell_t
 
 #define MAX_SHELL_COUNT 0x10 // 16 for now
 
-struct shell_t* create_shell(uint32_t id, struct keyboard_t* kb);
+struct shell_t* create_shell(uint32_t id);
 void print_shell_prefix(uint32_t shell_id);
 void shell_reset_cmd();
 void start_new_shell_line();

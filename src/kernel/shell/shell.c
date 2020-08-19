@@ -7,14 +7,13 @@ extern vga_terminal terminal;
 struct shell_t shells[MAX_SHELL_COUNT];
 uint32_t current_shell;
 
-struct shell_t* create_shell(uint32_t id, struct keyboard_t* kb)
+struct shell_t* create_shell(uint32_t id)
 {
     if(id > MAX_SHELL_COUNT)
     {
         puts("Shell instance out of bounds!");
     }
     shells[id].id = id;
-    shells[id].kb = kb;
     shells[id].working_dir = "root/";
     shells[id].debug = false;
     shells[id].min_cursor_pos = 0;
