@@ -83,7 +83,6 @@ struct keyboard_t
 {
     uint8_t current_key;
     uint8_t lock_flag;
-    uint8_t f_flag;
     uint8_t id;
     void(*key_callback)(uint8_t, uint8_t);
 };

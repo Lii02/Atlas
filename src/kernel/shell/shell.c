@@ -69,7 +69,6 @@ void shell_key_callback(uint8_t key, uint8_t flag)
         case KEY_BACKSPACE_PRESSED:
             if(terminal.cursor_x > shells[current_shell].min_cursor_pos)
             {
-                putc('\b');
             }
             break;
         default:
@@ -93,6 +92,17 @@ void push_char_to_input(char* str, char c)
 
 bool shell_interpret_command()
 {
+    if(strcmp(shells[current_shell].cmd, "clear") == 0)
+    {
+        vga_scroll(terminal.cursor_y);
+        return true;
+    }
+    else if(strcmp(shells[current_shell].cmd, "debug") == 0)
+    {
+        shells[current_shell].debug = !shells[current_shell].debug; 
+        return true;
+    }
+
     return false;
 }
 
