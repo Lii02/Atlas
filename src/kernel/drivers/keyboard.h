@@ -4,7 +4,11 @@
 #include "../std/stdint.h"
 #include "../std/stdbool.h"
 
+#ifndef QWERTY_KEYBOARD
+// Just QWERTY for now
+#define QWERTY_KEYBOARD
 #define KEY_ESC_PRESSED 0x1
+#define KEY_BACKTICK_PRESSED 0x29
 #define KEY_1_PRESSED 0x2
 #define KEY_2_PRESSED 0x3
 #define KEY_3_PRESSED 0x4
@@ -44,8 +48,8 @@
 #define KEY_L_PRESSED 0x26
 #define KEY_SEMICOLON_PRESSED 0x27
 #define KEY_QUOTE_PRESSED 0x28
-#define KEY_BACKTICK_PRESSED 0x29
 #define KEY_LSHIFT_PRESSED 0x2A
+#define KEY_LSHIFT_RELEASED 0xAA
 #define KEY_BACKSLASH_PRESSED 0x2B
 #define KEY_Z_PRESSED 0x2C
 #define KEY_X_PRESSED 0x2D
@@ -58,16 +62,20 @@
 #define KEY_PERIOD_PRESSED 0x34
 #define KEY_FWDSLASH_PRESSED 0x35
 #define KEY_RSHIFT_PRESSED 0x36
+#define KEY_RSHIFT_RELEASED 0xB6
 #define KEY_LALT_PRESSED 0x38
 #define KEY_SPACE_PRESSED 0x39
 #define KEY_CAPSLOCK_PRESSED 0x3A
 #define KEY_NUMLOCK_PRESSED 0x45
 #define KEY_SCROLLLOCK_PRESSED 0x46
+#endif
 
 #define NO_LOCK_FLAG (1 << 0)
 #define CAPS_LOCK_FLAG (1 << 2)
 #define SCROLL_LOCK_FLAG (1 << 2)
 #define NUM_LOCK_FLAG (1 << 3)
+#define LSHIFT_LOCK_FLAG (1 << 4)
+#define RSHIFT_LOCK_FLAG (1 << 5)
 
 #define MAX_KEYBOARD_INSTANCES 0x10 // 16 for now
 
@@ -75,11 +83,13 @@ struct keyboard_t
 {
     uint8_t current_key;
     uint8_t lock_flag;
+    uint8_t f_flag;
     uint8_t id;
     void(*key_callback)(uint8_t, uint8_t);
 };
 
 struct keyboard_t* init_keyboard_driver(uint8_t id, void(*key_callback)(uint8_t, uint8_t));
 void set_current_keyboard(uint8_t i);
+char get_ascii(uint8_t byte);
 
 #endif

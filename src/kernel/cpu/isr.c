@@ -1,5 +1,4 @@
 #include "isr.h"
-#include "idt.h"
 #include "../core/vga.h"
 #include "../core/asm.h"
 
