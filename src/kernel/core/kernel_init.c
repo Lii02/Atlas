@@ -1,3 +1,4 @@
+#include "../std/string.h"
 #include "asm.h"
 #include "vga.h"
 #include "mem.h"

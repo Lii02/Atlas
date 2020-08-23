@@ -1,5 +1,6 @@
 #include "string.h"
 #include "stdlib.h"
+#include "../core/mem.h"
 
 unsigned int strlen(char* str)
 {
@@ -10,9 +11,22 @@ unsigned int strlen(char* str)
 
 void itoa(int n, char* str, int radix)
 {
-	int i, sign;
+	int i, sign, strt;
+
+	switch (radix)
+	{
+	case 16:
+		str[0] = '0';
+		str[1] = 'x';
+		strt = 2;
+		i = strt;
+		break;
+	default:
+		strt = 0;
+		break;
+	}
 	
-	i = 0;
+	i = strt;
     if ((sign = n) < 0) n = -n;
     do
 	{
@@ -23,7 +37,7 @@ void itoa(int n, char* str, int radix)
     str[i] = '\0';
 
 	int c, j;
-    for (i = 0, j = strlen(str) - 1; i < j; i++, j--)
+    for (i = strt, j = strlen(str) - 1; i < j; i++, j--)
 	{
         c = str[i];
         str[i] = str[j];
@@ -60,12 +74,15 @@ char* strcat(char* dest, const char* src)
 
 char* strncpy(char* dst, const char* src, unsigned int n)
 {
-	if (n != 0) {
+	if (n != 0)
+	{
 		char* d = dst;
 		const char* s = src;
 
-		do {
-			if ((*d++ = *s++) == 0) {
+		do
+		{
+			if ((*d++ = *s++) == 0)
+			{
 				while (--n != 0)
 					*d++ = 0;
 				break;
@@ -80,24 +97,46 @@ char* strncat(char* s1, const char* s2, unsigned int n)
     unsigned len1 = strlen(s1);
     unsigned len2 = strlen(s2);
     
-    if (len2 < n) {
+    if (len2 < n)
+	{
 	    strcpy(&s1[len1], s2);
-    } else {
+    }
+	else
+	{
 	    strncpy(&s1[len1], s2, n);
 	    s1[len1 + n] = '\0';
     }
     return s1;
 }
 
+char* strchr(const char* p, int ch)
+{
+	char c;
+
+	c = ch;
+	for (;; ++p) {
+		if (*p == c)
+			return ((char *)p);
+		if (*p == '\0')
+			return (NULL);
+	}
+}
+
 char* strncmp(char* str1, char* str2, int n)
 {
 	if (n == 0)
 		return 0;
-	do {
+	do
+	{
 		if (*str1 != *str2++)
 			return (*(unsigned char *)str1 - *(unsigned char *)--str2);
 		if (*str1++ == 0)
 			break;
 	} while (--n != 0);
 	return 0;
+}
+
+unsigned int strcspn (const char* str, const char* reject)
+{
+	
 }
