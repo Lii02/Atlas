@@ -28,9 +28,9 @@ typedef struct
     size_t width;
     size_t height;
     uint32_t cursor_x;
-	uint32_t cursor_y;
-	vga_color raw_fg;
-	vga_color raw_bg;
+    uint32_t cursor_y;
+    vga_color raw_fg;
+    vga_color raw_bg;
     bool bcursor;
     uint8_t new_color;
 } vga_instance;
@@ -41,8 +41,12 @@ vga_instance init_vga(size_t width, size_t height);
 void set_vga_colors(vga_instance* vga, vga_color fg, vga_color bg);
 void vga_enable_cursor(vga_instance* vga);
 void vga_disable_cursor(vga_instance* vga);
-uint8_t create_color(vga_color fg, vga_color bg);
+uint8_t vga_create_color(vga_color fg, vga_color bg);
 uint16_t vga_char(char ch, uint8_t color);
-void vga_write_char(vga_instance* vga, char ch);
+void reset_vga(vga_instance* vga);
+void vga_update_cursor(vga_instance* vga);
+void write_char_vga(char ch, uint32_t x, uint32_t y, vga_instance* vga);
+void vga_writeptr(vga_instance* vga, uint16_t v, uint32_t x, uint32_t y);
+void vga_putc(vga_instance* vga, char ch);
 
 #endif
