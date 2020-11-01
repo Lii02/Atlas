@@ -1,0 +1,62 @@
+# -------------------------------------------------------------------
+# Beginning of Atlas kernel makefile
+# -------------------------------------------------------------------
+
+# Command specifications (AS = assembler, RM = remove, CC = complier, LD = linker)
+
+AS := as
+RM := rm
+CC := gcc
+LD := ld
+CFLAGS := -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32
+
+# When adding new module C/S files, add them as entries to the bottom of this file.
+# Use the following templates.
+
+# For assembly (.s) files:
+# FILENAME.o: FILENAME.s
+# 	$(AS) --32 -o FILENAME.o FILENAME.s
+
+# For C (.c) files:
+# FILENAME.o: FILENAME.c
+#	$(CC) $(CFLAGS) -o FILENAME.o -c FILENAME.c
+
+# Header (.h) files contain only declarations and are included by C files and
+# therefore don't need to be compiled directly.
+
+# IMPORTANT! Add all new module C/S files to this dependency list and to the compile list
+# on the kernel.elf line.
+
+clear:
+	$(RM) -f *.o
+	$(RM) -f *.elf
+	$(RM) -f *.o
+	$(RM) -f i32/*.o
+	$(RM) -f vga/*.o
+
+all: ../bcfs/kernel.sys
+
+../bcfs/kernel.sys: kernel.elf
+	objcopy -O binary kernel.elf ../bcfs/kernel.sys
+
+kernel.elf: kernel.o kernel_main.o i32/i32asm.o vga/vga_asm.o vga/vga.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o kernel_main.o i32/i32asm.o vga/vga_asm.o vga/vga.o -Ttext 0x2000
+
+kernel.o: kernel.s
+	$(AS) --32 -o kernel.o kernel.s
+
+kernel_main.o: kernel_main.c
+	$(CC) $(CFLAGS) -o kernel_main.o -c kernel_main.c
+
+# Intel specific code
+
+i32/i32asm.o: i32/i32asm.c
+	$(CC) $(CFLAGS) -o i32/i32asm.o -c i32/i32asm.c
+
+# VGA code
+
+vga/vga_asm.o: vga/vga_asm.s
+	$(AS) --32 -o vga/vga_asm.o vga/vga_asm.s
+
+vga/vga.o: vga/vga.c
+	$(CC) $(CFLAGS) -o vga/vga.o -c vga/vga.c

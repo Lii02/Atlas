@@ -15,32 +15,32 @@ CFLAGS := -Wall -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32
 # Additionally, you must create an entry for that makefile following this template.
 
 # bcfs/FILENAME.EXTENSION:
-# 	$(MAKE) -C src/FOLDER_CONTAINING_MAKEFILE/ ../../bcfs/FILENAME.EXTENSION
+# 	$(MAKE) -C FOLDER_CONTAINING_MAKEFILE/ ../../bcfs/FILENAME.EXTENSION
 
 #                  ||
 #                  ||
 # Insert here      \/
 all: bcfs/kernel.sys bcfs/boot.bin img/atlas.img
 
-img/atlas.img: src/bootloader/init.bin
+img/atlas.img: bootloader/init.bin
 	bash img.sh
 
-src/bootloader/init.bin:
-	$(MAKE) -C src/bootloader/ init.bin
+bootloader/init.bin:
+	$(MAKE) -C bootloader/ init.bin
 
 bcfs/boot.bin:
-	$(MAKE) -C src/bootloader/ boot.bin
+	$(MAKE) -C bootloader/ boot.bin
 
 bcfs/kernel.sys:
-	$(MAKE) -C src/kernel/ ../../bcfs/kernel.sys
+	$(MAKE) -C kernel/ ../bcfs/kernel.sys
 
 clearsrc:
-	$(MAKE) -C src/bootloader/ clear
-	$(MAKE) -C src/kernel/ clear
+	$(MAKE) -C bootloader/ clear
+	$(MAKE) -C kernel/ clear
 
 clear:
 	$(RM) -f bcfs/*.sys
 	$(RM) -f bcfs/*.bin
 	$(RM) -f img/*.img
-	$(MAKE) -C src/bootloader/ clear
-	$(MAKE) -C src/kernel/ clear
+	$(MAKE) -C bootloader/ clear
+	$(MAKE) -C kernel/ clear
