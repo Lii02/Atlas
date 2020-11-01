@@ -1,6 +1,6 @@
-#include "vga.h"
-#include "../ia64/ia64asm.h"
-#include "../standard/string.h"
+#include <atlas/vga/vga.h>
+#include <atlas/ia64/ia64asm.h>
+#include <atlas/standard/string.h>
 
 extern void set_as_vga();
 

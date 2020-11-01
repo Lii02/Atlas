@@ -1,4 +1,4 @@
-#include "ia64asm.h"
+#include <atlas/ia64/ia64asm.h>
 
 void ia64outb(uint16_t port, uint8_t data)
 {

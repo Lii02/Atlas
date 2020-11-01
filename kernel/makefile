@@ -46,12 +46,12 @@ kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
 
 kernel_main.o: kernel_main.c
-	$(CC) $(CFLAGS) -o kernel_main.o -c kernel_main.c
+	$(CC) $(CFLAGS) -o kernel_main.o -c kernel_main.c -I"../include/"
 
 # Intel specific code
 
 ia64/ia64asm.o: ia64/ia64asm.c
-	$(CC) $(CFLAGS) -o ia64/ia64asm.o -c ia64/ia64asm.c
+	$(CC) $(CFLAGS) -o ia64/ia64asm.o -c ia64/ia64asm.c -I"../include/"
 
 # VGA code
 
@@ -59,4 +59,4 @@ vga/vga_asm.o: vga/vga_asm.s
 	$(AS) --32 -o vga/vga_asm.o vga/vga_asm.s
 
 vga/vga.o: vga/vga.c
-	$(CC) $(CFLAGS) -o vga/vga.o -c vga/vga.c
+	$(CC) $(CFLAGS) -o vga/vga.o -c vga/vga.c -I"../include/"
