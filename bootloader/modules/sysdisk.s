@@ -368,10 +368,10 @@ sector_lba:	.word 0x2				# First sector to read from (specified in LBA)
 
 boot_repair:	.asciz "atlas: Repairing invalid boot device"
 disk_err:		.asciz "atlas: Fatal disk read error"
-search_err:		.asciz "atlas: Cannot find KERNEL.SYS"
+search_err:		.asciz "atlas: Cannot find KERNEL.PRG"
 fmt_err:		.asciz "atlas: Disk improperly formatted"
 
-filename_kern:	.asciz "kernel.sys"
+filename_kern:	.asciz "kernel.prg"
 
 # ========================================================================
 # Memory Partitioning

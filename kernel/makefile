@@ -31,16 +31,16 @@ clear:
 	$(RM) -f *.o
 	$(RM) -f *.elf
 	$(RM) -f *.o
-	$(RM) -f i32/*.o
+	$(RM) -f ia64/*.o
 	$(RM) -f vga/*.o
 
-all: ../bcfs/kernel.sys
+all: ../bcfs/kernel.prg
 
-../bcfs/kernel.sys: kernel.elf
-	objcopy -O binary kernel.elf ../bcfs/kernel.sys
+../bcfs/kernel.prg: kernel.elf
+	objcopy -O binary kernel.elf ../bcfs/kernel.prg
 
-kernel.elf: kernel.o kernel_main.o i32/i32asm.o vga/vga_asm.o vga/vga.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o kernel_main.o i32/i32asm.o vga/vga_asm.o vga/vga.o -Ttext 0x2000
+kernel.elf: kernel.o kernel_main.o ia64/ia64asm.o vga/vga_asm.o vga/vga.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o kernel_main.o ia64/ia64asm.o vga/vga_asm.o vga/vga.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
@@ -50,8 +50,8 @@ kernel_main.o: kernel_main.c
 
 # Intel specific code
 
-i32/i32asm.o: i32/i32asm.c
-	$(CC) $(CFLAGS) -o i32/i32asm.o -c i32/i32asm.c
+ia64/ia64asm.o: ia64/ia64asm.c
+	$(CC) $(CFLAGS) -o ia64/ia64asm.o -c ia64/ia64asm.c
 
 # VGA code
 

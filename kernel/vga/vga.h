@@ -1,7 +1,7 @@
 #ifndef VGA_H
 #define VGA_H
-#include "../intstd/stdint.h"
-#include "../intstd/stdbool.h"
+#include "../standard/stdint.h"
+#include "../standard/stdbool.h"
 
 typedef enum
 {
@@ -47,6 +47,9 @@ void reset_vga(vga_instance* vga);
 void vga_update_cursor(vga_instance* vga);
 void write_char_vga(char ch, uint32_t x, uint32_t y, vga_instance* vga);
 void vga_writeptr(vga_instance* vga, uint16_t v, uint32_t x, uint32_t y);
-void vga_putc(vga_instance* vga, char ch);
+void vga_putc(char ch, vga_instance* vga);
+void vga_puts(char* str, vga_instance* vga);
+void vga_scroll(uint32_t count, vga_instance* vga);
+char vga_read_char(uint32_t x, uint32_t y, vga_instance* vga);
 
 #endif
