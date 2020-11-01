@@ -1,4 +1,5 @@
 #include <atlas/vga/vga.h>
+#include <atlas/standard/malloc.h>
 
 void kernel_main()
 {
