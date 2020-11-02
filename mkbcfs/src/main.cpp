@@ -29,7 +29,7 @@ int main(int argc, char** argv)
    else
    {
       stringstream ss;
-      ss << experimental::filesystem::current_path().u8string() << "/" << string(argv[2]);
+      ss << string(argv[2]);
 
       stringstream ss0;
       ss0 << experimental::filesystem::current_path().u8string() << "/" << string(argv[1]);

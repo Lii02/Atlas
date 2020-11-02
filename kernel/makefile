@@ -34,14 +34,15 @@ clear:
 	$(RM) -f *.o
 	$(RM) -f ia64/*.o
 	$(RM) -f vga/*.o
+	$(RM) -f fs/*.o
 
 all: ../bcfs/kernel.prg
 
 ../bcfs/kernel.prg: kernel.elf
 	objcopy -O binary kernel.elf ../bcfs/kernel.prg
 
-kernel.elf: kernel.o kernel_main.o ia64/ia64asm.o vga/vga_asm.o vga/vga.o malloc.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o kernel_main.o ia64/ia64asm.o vga/vga_asm.o vga/vga.o malloc.o -Ttext 0x2000
+kernel.elf: kernel.o kernel_main.o ia64/ia64asm.o vga/vga_asm.o vga/vga.o malloc.o fs/bcfs.o fs/bcfs_inode.o fs/bcfs_vol.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o kernel_main.o ia64/ia64asm.o vga/vga_asm.o vga/vga.o malloc.o fs/bcfs.o fs/bcfs_inode.o fs/bcfs_vol.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
@@ -64,3 +65,14 @@ vga/vga_asm.o: vga/vga_asm.s
 
 vga/vga.o: vga/vga.c
 	$(CC) $(CFLAGS) -o vga/vga.o -c vga/vga.c 
+
+# BCFS filesystem code
+
+fs/bcfs.o: fs/bcfs.S
+	$(AS) --32 -o fs/bcfs.o fs/bcfs.S
+
+fs/bcfs_inode.o: fs/bcfs_inode.c
+	$(CC) $(CFLAGS) -o fs/bcfs_inode.o -c fs/bcfs_inode.c
+
+fs/bcfs_vol.o: fs/bcfs_vol.c
+	$(CC) $(CFLAGS) -o fs/bcfs_vol.o -c fs/bcfs_vol.c
