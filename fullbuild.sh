@@ -3,7 +3,7 @@
 mkdir -p img
 mkdir -p bcfs
 
-make clear
-make
-make clearsrc
+make clear -s
+make -s
+make clearsrc -s
 bash exec.sh

@@ -41,8 +41,8 @@ all: ../bcfs/kernel.prg
 ../bcfs/kernel.prg: kernel.elf
 	objcopy -O binary kernel.elf ../bcfs/kernel.prg
 
-kernel.elf: kernel.o kernel_main.o ia64/ia64asm.o vga/vga_asm.o vga/vga.o malloc.o fs/bcfs.o fs/bcfs_inode.o fs/bcfs_vol.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o kernel_main.o ia64/ia64asm.o vga/vga_asm.o vga/vga.o malloc.o fs/bcfs.o fs/bcfs_inode.o fs/bcfs_vol.o -Ttext 0x2000
+kernel.elf: kernel.o kernel_main.o ia64/ia64asm.o vga/vga.o malloc.o fs/bcfs.o fs/bcfs_inode.o fs/bcfs_vol.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o kernel_main.o ia64/ia64asm.o vga/vga.o malloc.o fs/bcfs.o fs/bcfs_inode.o fs/bcfs_vol.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
@@ -59,9 +59,6 @@ ia64/ia64asm.o: ia64/ia64asm.c
 	$(CC) $(CFLAGS) -o ia64/ia64asm.o -c ia64/ia64asm.c 
 
 # VGA code
-
-vga/vga_asm.o: vga/vga_asm.s
-	$(AS) --32 -o vga/vga_asm.o vga/vga_asm.s
 
 vga/vga.o: vga/vga.c
 	$(CC) $(CFLAGS) -o vga/vga.o -c vga/vga.c 
