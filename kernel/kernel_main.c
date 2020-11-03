@@ -1,5 +1,7 @@
 #include <atlas/vga/vga.h>
-#include <atlas/standard/malloc.h>
+#include <atlas/ia64/ia64asm.h>
+#include <atlas/kmalloc.h>
+#include <atlas/memory.h>
 
 void kernel_main()
 {

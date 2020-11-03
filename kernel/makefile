@@ -9,7 +9,7 @@ RM := rm
 CC := gcc
 LD := ld
 KERNELHDRS := -I../include/
-CFLAGS := -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32 $(KERNELHDRS)
+CFLAGS := -DIA64=1 -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32 $(KERNELHDRS)
 
 # When adding new module C/S files, add them as entries to the bottom of this file.
 # Use the following templates.
@@ -41,8 +41,8 @@ all: ../bcfs/kernel.prg
 ../bcfs/kernel.prg: kernel.elf
 	objcopy -O binary kernel.elf ../bcfs/kernel.prg
 
-kernel.elf: kernel.o kernel_main.o ia64/ia64asm.o vga/vga.o malloc.o fs/bcfs.o fs/bcfs_inode.o fs/bcfs_vol.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o kernel_main.o ia64/ia64asm.o vga/vga.o malloc.o fs/bcfs.o fs/bcfs_inode.o fs/bcfs_vol.o -Ttext 0x2000
+kernel.elf: kernel.o kernel_main.o ia64/ia64asm.o vga/vga.o kmalloc.o fs/bcfs_inode.o fs/bcfs_vol.o memory.o
+	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o kernel_main.o ia64/ia64asm.o vga/vga.o kmalloc.o fs/bcfs_inode.o fs/bcfs_vol.o memory.o -Ttext 0x2000
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
@@ -50,8 +50,11 @@ kernel.o: kernel.s
 kernel_main.o: kernel_main.c
 	$(CC) $(CFLAGS) -o kernel_main.o -c kernel_main.c
 	
-malloc.o: malloc.c
-	$(CC) $(CFLAGS) -o malloc.o -c malloc.c 
+kmalloc.o: kmalloc.c
+	$(CC) $(CFLAGS) -o kmalloc.o -c kmalloc.c
+	
+memory.o: memory.c
+	$(CC) $(CFLAGS) -o memory.o -c memory.c
 
 # Intel specific code
 
@@ -64,9 +67,6 @@ vga/vga.o: vga/vga.c
 	$(CC) $(CFLAGS) -o vga/vga.o -c vga/vga.c 
 
 # BCFS filesystem code
-
-fs/bcfs.o: fs/bcfs.S
-	$(AS) --32 -o fs/bcfs.o fs/bcfs.S
 
 fs/bcfs_inode.o: fs/bcfs_inode.c
 	$(CC) $(CFLAGS) -o fs/bcfs_inode.o -c fs/bcfs_inode.c

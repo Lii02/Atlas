@@ -10,7 +10,7 @@ void ia64outw(uint16_t port, uint16_t data)
     __asm__("outw %%ax, %%dx" : : "a" (data), "d" (port));
 }
 
-void ia64outl(uint16_t port, uint32_t data)
+void ia64outi(uint16_t port, uint32_t data)
 {
     __asm__("outl %%eax, %%dx" : : "a" (data), "d" (port));
 }
@@ -29,7 +29,7 @@ uint16_t ia64inw(uint16_t port)
 	return result;
 }
 
-uint32_t ia64inl(uint16_t port)
+uint32_t ia64ini(uint16_t port)
 {
     uint32_t result;
 	__asm__("inl %%dx, %%eax" : "=a" (result) : "d" (port));

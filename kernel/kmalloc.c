@@ -1,15 +1,15 @@
-#include <atlas/standard/malloc.h>
+#include <atlas/kmalloc.h>
 
-void* sbrk(uintptr_t i)
+static void* sbrk(uintptr_t i)
 {
 	uintptr_t old_brk = current_brk;
 	current_brk += i;
 	return (void*)old_brk;
 }
 
-memheader_t* get_free_block(size_t size)
+static kmemheader_t* get_free_block(size_t size)
 {
-	memheader_t* curr = head;
+	kmemheader_t* curr = head;
 	while(curr)
 	{
 		if(curr->s.is_free && curr->s.size >= size)
@@ -19,11 +19,11 @@ memheader_t* get_free_block(size_t size)
 	return NULL;
 }
 
-void* malloc(size_t size)
+void* kmalloc(size_t size)
 {
 	size_t total_size;
 	void* block;
-	memheader_t* header;
+	kmemheader_t* header;
 	if (!size)
 		return NULL;
 	header = get_free_block(size);
@@ -32,7 +32,7 @@ void* malloc(size_t size)
 		header->s.is_free = 0;
 		return (void*)(header + 1);
 	}
-	total_size = sizeof(memheader_t) + size;
+	total_size = sizeof(kmemheader_t) + size;
 	block = sbrk(total_size);
 	if (block == (void*) -1)
 	{
@@ -50,14 +50,14 @@ void* malloc(size_t size)
 	return (void*)(header + 1);	
 }
 
-void free(void* block)
+void kfree(void* block)
 {
-	memheader_t* header, *tmp;
+	kmemheader_t* header, *tmp;
 	void* programbreak;
 
 	if (!block)
 		return;
-	header = (memheader_t*)block - 1;
+	header = (kmemheader_t*)block - 1;
 
 	programbreak = sbrk(0);
 	if ((char*)block + header->s.size == programbreak)
@@ -78,7 +78,7 @@ void free(void* block)
 				tmp = tmp->s.next;
 			}
 		}
-		sbrk(0 - sizeof(memheader_t) - header->s.size);
+		sbrk(0 - sizeof(kmemheader_t) - header->s.size);
 		return;
 	}
 	header->s.is_free = true;

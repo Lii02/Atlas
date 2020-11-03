@@ -41,17 +41,17 @@ void set_vga_colors(vga_instance* vga, vga_color fg, vga_color bg)
 void vga_enable_cursor(vga_instance* vga)
 {
     vga->bcursor = true;
-    ia64outb(0x3D4, 0x0A);
-    ia64outb(0x3D5, (ia64inb(0x3D5) & 0xC0) | 0x0);
-    ia64outb(0x3D4, 0x0B);
-    ia64outb(0x3D5, (ia64inb(0x3D5) & 0xE0) | 0x1);
+    CPUOUTB(0x3D4, 0x0A);
+    CPUOUTB(0x3D5, (ia64inb(0x3D5) & 0xC0) | 0x0);
+    CPUOUTB(0x3D4, 0x0B);
+    CPUOUTB(0x3D5, (ia64inb(0x3D5) & 0xE0) | 0x1);
 }
 
 void vga_disable_cursor(vga_instance* vga)
 {
     vga->bcursor = false;
-    ia64outb(0x3D4, 0x0A);
-    ia64outb(0x3D5, 0x20);
+    CPUOUTB(0x3D4, 0x0A);
+	CPUOUTB(0x3D5, 0x20);
 }
 
 uint8_t vga_create_color(vga_color fg, vga_color bg)
@@ -83,10 +83,10 @@ void clear_vga(vga_instance* vga)
 void vga_update_cursor(vga_instance* vga)
 {
     size_t index = vga->cursor_y * vga->width + vga->cursor_x;
-    ia64outb(0x3D4, 0xE);
-    ia64outb(0x3D5, (uint8_t)(index >> 8));
-    ia64outb(0x3D4, 0xF);
-    ia64outb(0x3D5, (uint8_t)(index));
+    CPUOUTB(0x3D4, 0xE);
+    CPUOUTB(0x3D5, (uint8_t)(index >> 8));
+    CPUOUTB(0x3D4, 0xF);
+    CPUOUTB(0x3D5, (uint8_t)(index));
 }
 
 void write_char_vga(char ch, uint32_t x, uint32_t y, vga_instance* vga)
