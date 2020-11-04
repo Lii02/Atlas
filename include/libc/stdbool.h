@@ -1,5 +1,5 @@
-#ifndef STDBOOL_H
-#define STDBOOL_H
+#ifndef ATLAS_LIBC_STDBOOL_H
+#define ATLAS_LIBC_STDBOOL_H
 
 typedef unsigned char bool;
 #define true 0x1

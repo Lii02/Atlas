@@ -1,7 +1,7 @@
 #include <atlas/vga/vga.h>
-#include <atlas/ia64/ia64asm.h>
-#include <atlas/standard/string.h>
-#include <atlas/kmalloc.h>
+#include <atlas/i386/i386asm.h>
+#include <libc/string.h>
+#include <libc/malloc.h>
 
 #define VGA_SET_CURSOR(vga, x, y) vga->cursor_x = x; vga->cursor_y = y; vga_update_cursor();
 #define CRET(vga) vga->cursor_x = 0; vga_update_cursor(vga);
@@ -23,14 +23,14 @@ static vga_instance* kvga;
 
 void init_vga(size_t width, size_t height)
 {
-	kvga = (vga_instance*)kmalloc(sizeof(vga_instance));
+	kvga = (vga_instance*)malloc(sizeof(vga_instance));
     kvga->width = width;
     kvga->height = height;
 }
 
 void free_vga()
 {
-	kfree(kvga);
+	free(kvga);
 }
 
 void set_vga_colors(vga_color fg, vga_color bg)

@@ -1,6 +1,6 @@
 OUTPUT_FORMAT("pei-i386")
 ENTRY(main)
-phys = 0x00020000;
+phys = 0x2000;
 SECTIONS
 {
   .text phys : AT(phys) {

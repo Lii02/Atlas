@@ -19,8 +19,8 @@ read_kernel:					# Reads the kernel into memory
 	lea bx,disk_buffer				# Set memory location to be disk buffer
 	call read_inode					# Read root directory into disk buffer
 	
-	xor esi,esi						# Clear the value of SI
-	lea si,filename_kern			# Load location of boot.sys filename into SI
+	xor esi, esi						# Clear the value of SI
+	lea si,filename_kern			# Load location of kernel.sys filename into SI
 	call find_file					# Locate the file and store inode index in EDI
 	
 	mov ax,0x200					# Set offset for kernel (linear address 0x2000)
@@ -368,10 +368,11 @@ sector_lba:	.word 0x2				# First sector to read from (specified in LBA)
 
 boot_repair:	.asciz "atlas: Repairing invalid boot device"
 disk_err:		.asciz "atlas: Fatal disk read error"
-search_err:		.asciz "atlas: Cannot find KERNEL.PRG"
+search_err:		.asciz "atlas: Cannot find KERNEL.SYS"
 fmt_err:		.asciz "atlas: Disk improperly formatted"
 
-filename_kern:	.asciz "kernel.prg"
+filename_kern:	.asciz "kernel.sys"
+filename_libc:	.asciz "libc.al"
 
 # ========================================================================
 # Memory Partitioning

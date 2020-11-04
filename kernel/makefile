@@ -9,7 +9,23 @@ RM := rm
 CC := gcc
 LD := ld
 KERNELHDRS := -I../include/
-CFLAGS := -DIA64=1 -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32 $(KERNELHDRS)
+KERNELLIB := -L../libc/
+CFLAGS := -DIA64=1 -w -fno-builtin -fno-pie -ffreestanding -nostdinc -m32 $(KERNELHDRS)
+
+OBJS = \
+kernel.o \
+kernel_main.o \
+i386/i386asm.o \
+vga/vga.o \
+fs/bcfs_inode.o \
+fs/bcfs_vol.o \
+asm/irqbackend.o \
+asm/irq.o
+
+LIBS = -nostdlib
+LINK_LIST = \
+	$(LIBS) \
+	$(OBJS) \
 
 # When adding new module C/S files, add them as entries to the bottom of this file.
 # Use the following templates.
@@ -31,36 +47,29 @@ CFLAGS := -DIA64=1 -w -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -
 clear:
 	$(RM) -f *.o
 	$(RM) -f *.elf
-	$(RM) -f *.o
-	$(RM) -f ia64/*.o
+	$(RM) -f i386/*.o
 	$(RM) -f vga/*.o
 	$(RM) -f fs/*.o
 	$(RM) -f asm/*.o
 
-all: ../bcfs/kernel.prg
+all: ../bcfs/kernel.sys
 
-../bcfs/kernel.prg: kernel.elf
-	objcopy -O binary kernel.elf ../bcfs/kernel.prg
+../bcfs/kernel.sys: kernel.elf
+	objcopy -O binary kernel.elf ../bcfs/kernel.sys
 
-kernel.elf: kernel.o kernel_main.o ia64/ia64asm.o vga/vga.o kmalloc.o fs/bcfs_inode.o fs/bcfs_vol.o memory.o asm/irqbackend.o asm/irq.o
-	$(CC) $(CFLAGS) -T link.ld -o kernel.elf kernel.o kernel_main.o ia64/ia64asm.o vga/vga.o kmalloc.o fs/bcfs_inode.o fs/bcfs_vol.o memory.o asm/irqbackend.o asm/irq.o -Ttext 0x2000
+kernel.elf: $(OBJS)
+	$(LD) -m elf_i386 -T link.ld -o kernel.elf -Ttext 0x2000 $(LINK_LIST) ../libc/libc.a
 
 kernel.o: kernel.s
 	$(AS) --32 -o kernel.o kernel.s
 
 kernel_main.o: kernel_main.c
 	$(CC) $(CFLAGS) -o kernel_main.o -c kernel_main.c
-	
-kmalloc.o: kmalloc.c
-	$(CC) $(CFLAGS) -o kmalloc.o -c kmalloc.c
-	
-memory.o: memory.c
-	$(CC) $(CFLAGS) -o memory.o -c memory.c
 
 # Intel specific code
 
-ia64/ia64asm.o: ia64/ia64asm.c
-	$(CC) $(CFLAGS) -o ia64/ia64asm.o -c ia64/ia64asm.c 
+i386/i386asm.o: i386/i386asm.c
+	$(CC) $(CFLAGS) -o i386/i386asm.o -c i386/i386asm.c 
 
 # VGA code
 

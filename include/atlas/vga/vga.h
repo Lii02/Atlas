@@ -1,7 +1,7 @@
-#ifndef VGA_H
-#define VGA_H
-#include "../standard/stdint.h"
-#include "../standard/stdbool.h"
+#ifndef ATLAS_VGA_H
+#define ATLAS_VGA_H
+#include "../../libc/stdint.h"
+#include "../../libc/stdbool.h"
 
 typedef enum
 {

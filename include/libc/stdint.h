@@ -1,5 +1,5 @@
-#ifndef STDINT_H
-#define STDINT_H
+#ifndef ATLAS_LIBC_STDINT_H
+#define ATLAS_LIBC_STDINT_H
 
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;

@@ -20,7 +20,7 @@ CFLAGS := -Wall -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32
 #                  ||
 #                  ||
 # Insert here      \/
-all: bcfs/kernel.prg bcfs/boot.bin img/atlas.img
+all: bcfs/libc.al bcfs/kernel.sys bcfs/boot.bin img/atlas.img
 
 img/atlas.img: bootloader/init.bin
 	bash img.sh
@@ -31,16 +31,23 @@ bootloader/init.bin:
 bcfs/boot.bin:
 	$(MAKE) -C bootloader/ boot.bin
 
-bcfs/kernel.prg:
-	$(MAKE) -C kernel/ ../bcfs/kernel.prg
+bcfs/libc.al:
+	$(MAKE) -C libc/ ../bcfs/libc.al
+
+bcfs/kernel.sys:
+	$(MAKE) -C kernel/ ../bcfs/kernel.sys
 
 clearsrc:
 	$(MAKE) -C bootloader/ clear
 	$(MAKE) -C kernel/ clear
+	$(MAKE) -C libc/ clear
 
 clear:
-	$(RM) -f bcfs/*.prg
+	$(RM) -f bcfs/*.sys
 	$(RM) -f bcfs/*.bin
+	$(RM) -f bcfs/*.al
 	$(RM) -f img/*.img
+	$(RM) -f libc/*.al
 	$(MAKE) -C bootloader/ clear
 	$(MAKE) -C kernel/ clear
+	$(MAKE) -C libc/ clear

@@ -1,6 +1,6 @@
 #ifndef BCFS_INODE_H
 #define BCFS_INODE_H
-#include "../standard/stdint.h"
+#include "../../libc/stdint.h"
 
 #define UNALLOCATED_INODE 0x0
 #define DATA_PTR 0x1

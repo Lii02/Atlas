@@ -4,8 +4,7 @@
 
 .code32								# Code runs in 32 bits
 .intel_syntax noprefix				# Use intel syntax instead of AT&T
-.text								# Code segment, not represented as data
-.org 0x0							# Memory offset is specified during assembling (0x2000)
+.text
 
 .global start						# Start is accessible from bootloader
 
@@ -19,7 +18,7 @@
 # Kernel Entry Point
 
 start:							# Called from bootloader; initiates kernel
-	xor eax, eax
+	mov eax, 0
 	lea esp, sys_stack				# Set stack to the start point of the 4KB stack
 	call kernel_main				# Jump to function in C kernel
 	jmp $							# In the event of kernel exit, hang CPU

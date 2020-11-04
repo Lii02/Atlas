@@ -1,6 +1,6 @@
 #ifndef IA64ASM_H
 #define IA64ASM_H
-#include "../standard/stdint.h"
+#include "../../libc/stdint.h"
 
 #if defined(IA64)
 #define CPUOUTB ia64outb
