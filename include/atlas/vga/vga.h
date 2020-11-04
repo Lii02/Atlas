@@ -37,19 +37,20 @@ typedef struct
 
 #define VGA_BUFFER 0xB8000
 
-vga_instance init_vga(size_t width, size_t height);
-void set_vga_colors(vga_instance* vga, vga_color fg, vga_color bg);
-void vga_enable_cursor(vga_instance* vga);
-void vga_disable_cursor(vga_instance* vga);
+void init_vga(size_t width, size_t height);
+void free_vga();
+void set_vga_colors(vga_color fg, vga_color bg);
+void vga_enable_cursor();
+void vga_disable_cursor();
 uint8_t vga_create_color(vga_color fg, vga_color bg);
 uint16_t vga_char(char ch, uint8_t color);
-void reset_vga(vga_instance* vga);
-void vga_update_cursor(vga_instance* vga);
-void write_char_vga(char ch, uint32_t x, uint32_t y, vga_instance* vga);
-void vga_writeptr(vga_instance* vga, uint16_t v, uint32_t x, uint32_t y);
-void vga_putc(char ch, vga_instance* vga);
-void vga_puts(char* str, vga_instance* vga);
-void vga_scroll(uint32_t count, vga_instance* vga);
-char vga_read_char(uint32_t x, uint32_t y, vga_instance* vga);
+void reset_vga();
+void vga_update_cursor();
+void write_char_vga(char ch, uint32_t x, uint32_t y);
+void vga_writeptr(uint16_t v, uint32_t x, uint32_t y);
+void vga_putc(char ch);
+void vga_puts(char* str);
+void vga_scroll(uint32_t count);
+char vga_read_char(uint32_t x, uint32_t y);
 
 #endif

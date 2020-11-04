@@ -1,12 +1,11 @@
 #include <atlas/vga/vga.h>
 #include <atlas/ia64/ia64asm.h>
 #include <atlas/standard/string.h>
+#include <atlas/kmalloc.h>
 
-extern void set_as_vga();
-
-#define VGA_SET_CURSOR(vga, x, y) vga->cursor_x = x; vga->cursor_y = y; vga_update_cursor(vga);
+#define VGA_SET_CURSOR(vga, x, y) vga->cursor_x = x; vga->cursor_y = y; vga_update_cursor();
 #define CRET(vga) vga->cursor_x = 0; vga_update_cursor(vga);
-#define LNFEED(vga) vga->cursor_y++; if(vga->cursor_y >= vga->height) vga_scroll(1, vga); else vga_update_cursor(vga);
+#define LNFEED(vga) vga->cursor_y++; if(vga->cursor_y >= vga->height) vga_scroll(1); else vga_update_cursor();
 #define BACKSPACE(vga) \
 	if(vga->cursor_x == 0) \
 	{ \
@@ -18,38 +17,41 @@ extern void set_as_vga();
 	} \
 	else \
 		vga->cursor_x--; \
-	vga_putc(' ', vga); \
+	vga_putc(' '); \
 
-vga_instance init_vga(size_t width, size_t height)
+static vga_instance* kvga;
+
+void init_vga(size_t width, size_t height)
 {
-    vga_instance vga;
-    vga.width = width;
-    vga.height = height;
-    clear_vga(&vga);
-    //set_as_vga();
-    return vga;
+	kvga = (vga_instance*)kmalloc(sizeof(vga_instance));
+    kvga->width = width;
+    kvga->height = height;
 }
 
-void set_vga_colors(vga_instance* vga, vga_color fg, vga_color bg)
+void free_vga()
 {
-    vga->raw_fg = fg;
-    vga->raw_fg = bg;
-    vga->new_color = vga_create_color(fg, bg);
-    clear_vga(vga);
+	kfree(kvga);
 }
 
-void vga_enable_cursor(vga_instance* vga)
+void set_vga_colors(vga_color fg, vga_color bg)
 {
-    vga->bcursor = true;
+    kvga->raw_fg = fg;
+    kvga->raw_fg = bg;
+    kvga->new_color = vga_create_color(fg, bg);
+}
+
+void vga_enable_cursor()
+{
+    kvga->bcursor = true;
     CPUOUTB(0x3D4, 0x0A);
-    CPUOUTB(0x3D5, (ia64inb(0x3D5) & 0xC0) | 0x0);
+    CPUOUTB(0x3D5, (CPUINB(0x3D5) & 0xC0) | 0x0);
     CPUOUTB(0x3D4, 0x0B);
-    CPUOUTB(0x3D5, (ia64inb(0x3D5) & 0xE0) | 0x1);
+    CPUOUTB(0x3D5, (CPUINB(0x3D5) & 0xE0) | 0x1);
 }
 
-void vga_disable_cursor(vga_instance* vga)
+void vga_disable_cursor()
 {
-    vga->bcursor = false;
+    kvga->bcursor = false;
     CPUOUTB(0x3D4, 0x0A);
 	CPUOUTB(0x3D5, 0x20);
 }
@@ -64,44 +66,44 @@ uint16_t vga_char(char ch, uint8_t color)
     return (uint16_t) ch | ((uint16_t) color << 8);
 }
 
-void clear_vga(vga_instance* vga)
+void clear_vga()
 {
     uint16_t* buff = VGA_BUFFER;
-    for(int x = 0; x < vga->width; x++)
+    for(int x = 0; x < kvga->width; x++)
     {
-        for(int y = 0; y < vga->height; y++)
+        for(int y = 0; y < kvga->height; y++)
         {
-            size_t index = y * vga->width + x;
-            buff[index] = vga_char(' ', vga->new_color); 
+            size_t index = y * kvga->width + x;
+            buff[index] = vga_char(' ', kvga->new_color); 
         }
     }
-    vga->cursor_x = 0;
-    vga->cursor_y = 0;
-    vga_update_cursor(vga);
+    kvga->cursor_x = 0;
+    kvga->cursor_y = 0;
+    vga_update_cursor();
 }
 
-void vga_update_cursor(vga_instance* vga)
+void vga_update_cursor()
 {
-    size_t index = vga->cursor_y * vga->width + vga->cursor_x;
+    size_t index = kvga->cursor_y * kvga->width + kvga->cursor_x;
     CPUOUTB(0x3D4, 0xE);
     CPUOUTB(0x3D5, (uint8_t)(index >> 8));
     CPUOUTB(0x3D4, 0xF);
     CPUOUTB(0x3D5, (uint8_t)(index));
 }
 
-void write_char_vga(char ch, uint32_t x, uint32_t y, vga_instance* vga)
+void write_char_vga(char ch, uint32_t x, uint32_t y)
 {
-    vga_writeptr(vga, vga_char(ch, vga->new_color), x, y);
+    vga_writeptr(vga_char(ch, kvga->new_color), x, y);
 }
 
-void vga_writeptr(vga_instance* vga, uint16_t v, uint32_t x, uint32_t y)
+void vga_writeptr(uint16_t v, uint32_t x, uint32_t y)
 {
-    uint32_t index = y * vga->width + x;
+    uint32_t index = y * kvga->width + x;
     uint16_t* buff = VGA_BUFFER;
     buff[index] = v;
 }
 
-void vga_putc(char ch, vga_instance* vga)
+void vga_putc(char ch)
 {
     switch(ch)
     {
@@ -109,57 +111,57 @@ void vga_putc(char ch, vga_instance* vga)
 	case '\t':
 		for(int i = 0; i < 4; i++)
 		{
-			vga_putc(' ', vga);
+			vga_putc(' ');
 			return;
 		}
 	case '\r':
-		CRET(vga);
+		CRET(kvga);
 		return;
 	case '\n':
-		LNFEED(vga);
+		LNFEED(kvga);
 		return;
 	case '\b':
-		BACKSPACE(vga);
+		BACKSPACE(kvga);
 		return;
 	default:
-		write_char_vga(ch, vga->cursor_x++, vga->cursor_y, vga);
-		vga_update_cursor(vga);
+		write_char_vga(ch, kvga->cursor_x++, kvga->cursor_y);
+		vga_update_cursor();
 		return;
 	}
 }
 
-void vga_puts(char* str, vga_instance* vga)
+void vga_puts(char* str)
 {
 	size_t len = strlen(str);
 	int i;
-	for(i = 0; i < len; i++) vga_putc(str[i], vga);
+	for(i = 0; i < len; i++) vga_putc(str[i]);
 }
 
-void vga_scroll(uint32_t count, vga_instance* vga)
+void vga_scroll(uint32_t count)
 {
 	int i, x, y;
 	for(i = 0; i < count; i++)
 	{
-		for(y = 0; y < vga->height - 1; y++)
+		for(y = 0; y < kvga->height - 1; y++)
 		{
-			for(x = 0; x < vga->width; x++) vga_writeptr(vga, vga_read_char(x, y + 1, vga), x, y);	
+			for(x = 0; x < kvga->width; x++) vga_writeptr(vga_read_char(x, y + 1), x, y);	
 		}
 	}
-	for(x = 0; x < vga->width; x++) vga_writeptr(vga, ' ', x, vga->height - 1);
+	for(x = 0; x < kvga->width; x++) vga_writeptr(' ', x, kvga->height - 1);
 
-	if(count > vga->cursor_y) 
+	if(count > kvga->cursor_y) 
 	{
-		VGA_SET_CURSOR(vga, 0, 0);
+		VGA_SET_CURSOR(kvga, 0, 0);
 	}
 	else
 	{
-		VGA_SET_CURSOR(vga, vga->cursor_x, vga->cursor_y - 1)
+		VGA_SET_CURSOR(kvga, kvga->cursor_x, kvga->cursor_y - 1)
 	}
 }
 
-char vga_read_char(uint32_t x, uint32_t y, vga_instance* vga)
+char vga_read_char(uint32_t x, uint32_t y)
 {
-	uint32_t index = y * vga->width + x;
+	uint32_t index = y * kvga->width + x;
 	uint16_t* buff = VGA_BUFFER;
 	return buff[index] & 0xFF;
 }
