@@ -74,6 +74,8 @@
 #define NUM_LOCK_FLAG (1 << 3)
 #define LSHIFT_LOCK_FLAG (1 << 4)
 #define RSHIFT_LOCK_FLAG (1 << 5)
+#define LCTRL_FLAG (1 << 6)
+#define LALT_FLAG (1 << 7)
 
 struct keyboard_t
 {

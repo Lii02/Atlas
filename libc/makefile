@@ -10,7 +10,7 @@ CC := gcc
 LD := ld
 AR := ar
 KERNELHDRS := -I../include/
-CFLAGS := -DIA64=1 -w -fno-builtin -fno-pie -ffreestanding -nostdinc -m32 $(KERNELHDRS)
+CFLAGS := -DI386=1 -w -fno-builtin -fno-pie -ffreestanding -nostdinc -m32 $(KERNELHDRS)
 
 OBJS = \
 	stdio.o \

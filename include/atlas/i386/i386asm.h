@@ -1,49 +1,49 @@
-#ifndef IA64ASM_H
-#define IA64ASM_H
+#ifndef i386ASM_H
+#define i386ASM_H
 #include "../../libc/stdint.h"
 
-#if defined(IA64)
-#define CPUOUTB ia64outb
-#define CPUOUTW ia64outw
-#define CPUOUTL ia64outl
-#define CPUINB ia64inb
-#define CPUINW ia64intw
-#define CPUINL ia64inl
-#define CPUGETBYTE ia64getbyte
-#define CPUGETWORD ia64getword
-#define CPUGETDWORD ia64getdword
-#define CPUPUTBYTE ia64putbyte
-#define CPUPUTWORD ia64putword
-#define CPUPUTDWORD ia64putdword
+#if defined(I386)
+#define CPUOUTB i386outb
+#define CPUOUTW i386outw
+#define CPUOUTL i386outl
+#define CPUINB i386inb
+#define CPUINW i386intw
+#define CPUINL i386inl
+#define CPUGETBYTE i386getbyte
+#define CPUGETWORD i386getword
+#define CPUGETDWORD i386getdword
+#define CPUPUTBYTE i386putbyte
+#define CPUPUTWORD i386putword
+#define CPUPUTDWORD i386putdword
 #define CPULO16(addr) (int16_t)(addr & 0xFFFF)
 #define CPUHI16(addr) (int16_t)((addr >> 16) & 0xFFFF)
 #endif
 
-struct ia64registers_t
+struct i386registers_t
 {
     uint32_t ds;
     uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
     uint32_t int_no, err_code;
     uint32_t eip, cs, eflags, useresp, ss;
 };
-#if defined(IA64)
-typedef struct ia64registers_t cpuregisters_t;
+#if defined(I386)
+typedef struct i386registers_t cpuregisters_t;
 #endif
 
-void ia64outb(uint16_t port, uint8_t data);
-void ia64outw(uint16_t port, uint16_t data);
-void ia64outl(uint16_t port, uint32_t data);
+void i386outb(uint16_t port, uint8_t data);
+void i386outw(uint16_t port, uint16_t data);
+void i386outl(uint16_t port, uint32_t data);
 
-uint8_t ia64inb(uint16_t port);
-uint16_t ia64inw(uint16_t port);
-uint32_t ia64inl(uint16_t port);
+uint8_t i386inb(uint16_t port);
+uint16_t i386inw(uint16_t port);
+uint32_t i386inl(uint16_t port);
 
-int8_t ia64getbyte(const char* addr);
-int16_t ia64getword(const short* addr);
-int32_t ia64getdword(const int* addr);
+int8_t i386getbyte(const char* addr);
+int16_t i386getword(const short* addr);
+int32_t i386getdword(const int* addr);
 
-void ia64putbyte(int8_t v, char* addr);
-void ia64putword(int16_t v, short* addr);
-void ia64putdword(int32_t v, int* addr);
+void i386putbyte(int8_t v, char* addr);
+void i386putword(int16_t v, short* addr);
+void i386putdword(int32_t v, int* addr);
 
 #endif
