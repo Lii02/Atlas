@@ -20,7 +20,8 @@ vga/vga.o \
 fs/bcfs_inode.o \
 fs/bcfs_vol.o \
 asm/irqbackend.o \
-asm/irq.o
+asm/irq.o \
+keyboard.o \
 
 LIBS = -nostdlib
 LINK_LIST = \
@@ -65,6 +66,9 @@ kernel.o: kernel.s
 
 kernel_main.o: kernel_main.c
 	$(CC) $(CFLAGS) -o kernel_main.o -c kernel_main.c
+	
+keyboard.o: keyboard.c
+	$(CC) $(CFLAGS) -o keyboard.o -c keyboard.c
 
 # Intel specific code
 

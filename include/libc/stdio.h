@@ -13,8 +13,9 @@ typedef struct file_t FILE;
 
 FILE* stdoutf;
 
-void putchar(char c);
+char putchar(char c);
 void puts(const char* str);
+int printf(const char* format, ...);
 void init_stdout(unsigned int size, void(*putc)(char));
 void set_stdout(FILE* f);
 void free_stdout();
