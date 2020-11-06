@@ -22,7 +22,7 @@ fs/bcfs_vol.o \
 asm/irqbackend.o \
 asm/irq.o \
 keyboard.o \
-hdd.o \
+ata.o \
 
 LIBS = -nostdlib
 LINK_LIST = \
@@ -71,8 +71,8 @@ kernel_main.o: kernel_main.c
 keyboard.o: keyboard.c
 	$(CC) $(CFLAGS) -o keyboard.o -c keyboard.c
 	
-hdd.o: hdd.c
-	$(CC) $(CFLAGS) -o hdd.o -c hdd.c
+ata.o: ata.c
+	$(CC) $(CFLAGS) -o ata.o -c ata.c
 
 # Intel specific code
 

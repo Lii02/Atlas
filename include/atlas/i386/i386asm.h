@@ -7,7 +7,7 @@
 #define CPUOUTW i386outw
 #define CPUOUTL i386outl
 #define CPUINB i386inb
-#define CPUINW i386intw
+#define CPUINW i386inw
 #define CPUINL i386inl
 #define CPUGETBYTE i386getbyte
 #define CPUGETWORD i386getword

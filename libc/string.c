@@ -40,3 +40,23 @@ void* memset(void* ptr, int v, size_t s)
 	ptr = (void*)temp;
 	return ptr;
 }
+
+void* memcpy(void* dest, void* src, int32_t len)
+{
+	char *d = dest;
+	const char *s = src;
+	while (len--)
+		*d++ = *s++;
+	return dest;
+}
+
+char* strcpy(char* dest, char* src)
+{
+	return memcpy(dest, src, strlen(src) + 1);
+}
+
+char* strcat(char* dest, char* src)
+{
+	strcpy(dest + strlen(dest), src);
+	return dest;
+}

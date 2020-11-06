@@ -119,6 +119,7 @@ void vga_putc(char ch)
 		return;
 	case '\n':
 		LNFEED(kvga);
+		CRET(kvga);
 		return;
 	case '\b':
 		BACKSPACE(kvga);

@@ -27,6 +27,6 @@ typedef struct
 	uint16_t permissions;
 	uint32_t block_ptr;
 	uint8_t* os_info; // 32 bytes
-} bcfs_inodeinfo_t;
+} bcfs_inode_t;
 
 #endif
