@@ -48,6 +48,7 @@ typedef struct
 	int32_t posix_mount;
 	int32_t posix_write;
 	int32_t posix_inspection;
+	char unused0[886];
 } bcfs_volume_t;
 
 #endif

@@ -104,6 +104,7 @@ void ata_init_device(struct ata_device_t* dev)
 	{
 		buff[i] = CPUINW(dev->base);
 	}
+	ata_io_wait(dev);
 
 	uint8_t* ptr = (uint8_t*)&dev->identity.model;
 	for (int i = 0; i < 39; i += 2)
@@ -132,7 +133,7 @@ bool ata_read_sector(uint8_t* buff, uint32_t lba, struct ata_device_t* dev)
 	CPUOUTB(dev->base + ATA_REG_COMMAND, ATA_CMD_READ_PIO);
 	ata_io_wait(dev);
 
-	for(int i = 0; i < 256; i++)
+	for(int i = 0; i < 512; i++)
 	{
 		uint16_t data = CPUINB(dev->base + ATA_REG_DATA);
 		*(uint16_t *)(buff + i * 2) = data;

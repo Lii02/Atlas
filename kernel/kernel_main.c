@@ -11,8 +11,6 @@
 #define WIDTH 80
 #define HEIGHT 25
 
-// TODO(ldi): fix malloc bugs(if any)
-
 void kernel_main()
 {
 	// initialize the kernel
@@ -28,7 +26,20 @@ void kernel_main()
 	
 	puts("printf test\n");
 
-	puts(primary_volume_m.ata_device->identity.model);
+	printf("%s\n", primary_volume_m.ata_device->identity.model);
+	char buff[8];
+	itoa(primary_volume_m.sig, buff, 10);
+	printf("signature: %s\n", buff);
+	itoa(primary_volume_m.inode_count, buff, 10);
+	printf("inode count: %s\n", buff);
+	itoa(primary_volume_m.major_version, buff, 10);
+	printf("major: %s\n", buff);
+	itoa(primary_volume_m.minor_version, buff, 10);
+	printf("minor: %s\n", buff);
+	itoa(primary_volume_m.block_count, buff, 10);
+	printf("block count: %s\n", buff);
+	itoa(primary_volume_m.block_size, buff, 10);
+	printf("block size: %s\n", buff);
 
 	free_vga();
 	free_stdout();

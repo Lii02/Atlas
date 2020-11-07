@@ -4,7 +4,6 @@
 #include "stdbool.h"
 
 typedef unsigned int uintptr_t;
-static uintptr_t current_brk;
 typedef int8_t ALIGN[0x10];
 
 union memheader
@@ -18,7 +17,6 @@ union memheader
 	ALIGN stub;
 };
 typedef union memheader memheader_t;
-static memheader_t *head, *tail;
 
 static void* sbrk(uintptr_t i);
 static memheader_t* get_free_block(size_t size);

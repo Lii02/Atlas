@@ -1,5 +1,8 @@
 #include <libc/malloc.h>
 
+static memheader_t *head, *tail;
+static uintptr_t current_brk = 0;
+
 static void* sbrk(uintptr_t i)
 {
 	uintptr_t old_brk = current_brk;
