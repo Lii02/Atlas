@@ -1,11 +1,12 @@
 #ifndef BCFS_VOL_H
 #define BCFS_VOL_H
 #include <libc/stdint.h>
+#include <atlas/ata.h>
 
-enum volume_type
+typedef enum
 {
 	ATA = 0x0,
-};
+} device_type;
 
 #define BCFS_SIGNATURE 0xDC75
 
@@ -20,12 +21,18 @@ enum volume_type
 #define FS_PANIC 0x2
 
 typedef struct
-{
+{	
+	union
+	{
+		device_type dtype;
+
+		struct
+		{
+			struct ata_device_t* ata_device;
+		}
+	};	
+
 	int16_t sig;
-	void* device;
-	enum volume_type type;
-	int8_t index;
-	char* drivename;
 	int16_t state;
 	int16_t error_comp;
 	int32_t inode_count;
@@ -38,7 +45,9 @@ typedef struct
 	int32_t unallocated_block_index;
 	int32_t bad_block_index;
 	int32_t unallocated_count;
-	// POSIX stuff would go here
+	int32_t posix_mount;
+	int32_t posix_write;
+	int32_t posix_inspection;
 } bcfs_volume_t;
 
 #endif

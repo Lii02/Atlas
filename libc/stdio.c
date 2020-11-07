@@ -28,13 +28,6 @@ static bool print(const char* data, size_t length)
 	return true;
 }
 
-static unsigned int get_digit_length (int n)
-{
-    if (n < 0) return get_digit_length ((n == INT32_MIN) ? INT32_MIN : -n);
-	else if (n < 10) return 1;
-    return 1 + get_digit_length(n / 10);
-}
-
 int printf(const char* format, ...)
 {
 	va_list parameters;
@@ -69,17 +62,6 @@ int printf(const char* format, ...)
 			if (!print(&c, sizeof(c)))
 				return -1;
 			written++;
-		}
-		else if(*format == 'd')
-		{
-			format++;
-			int val = va_arg(parameters, int);
-			size_t len = get_digit_length(val);
-			char buff[len];
-			itoa(val, buff, 10);
-			if(!print(buff, len));
-				return -1;
-			written += buff;
 		}
 		else if (*format == 's')
 		{

@@ -23,6 +23,8 @@ asm/irqbackend.o \
 asm/irq.o \
 keyboard.o \
 ata.o \
+fs/bcfs.o \
+fs/vfs.o \
 
 LIBS = -nostdlib
 LINK_LIST = \
@@ -91,6 +93,12 @@ fs/bcfs_inode.o: fs/bcfs_inode.c
 
 fs/bcfs_vol.o: fs/bcfs_vol.c
 	$(CC) $(CFLAGS) -o fs/bcfs_vol.o -c fs/bcfs_vol.c
+	
+fs/bcfs.o: fs/bcfs.c
+	$(CC) $(CFLAGS) -o fs/bcfs.o -c fs/bcfs.c
+	
+fs/vfs.o: fs/vfs.c
+	$(CC) $(CFLAGS) -o fs/vfs.o -c fs/vfs.c
 
 # ASM code
 
