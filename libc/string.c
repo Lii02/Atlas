@@ -20,14 +20,7 @@ void itoa(int32_t n, char* str, uint32_t radix)
 
     if (sign < 0) str[i++] = '-';
     str[i] = '\0';
-
-	int c, j;
-    for (i = 0, j = strlen(str) - 1; i < j; i++, j--)
-	{
-        c = str[i];
-        str[i] = str[j];
-        str[j] = c;
-    }
+	strrev(str);
 }
 
 void* memset(void* ptr, int v, size_t s)
@@ -59,4 +52,18 @@ char* strcat(char* dest, char* src)
 {
 	strcpy(dest + strlen(dest), src);
 	return dest;
+}
+
+void strrev(uint8_t* str)
+{
+	int i;
+	int j;
+	unsigned char a;
+	unsigned len = strlen((const char*)str);
+	for (i = 0, j = len - 1; i < j; i++, j--)
+	{
+		a = str[i];
+		str[i] = str[j];
+		str[j] = a;
+	}
 }

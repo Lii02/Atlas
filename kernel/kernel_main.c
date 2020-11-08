@@ -40,7 +40,13 @@ void kernel_main()
 	printf("block count: %s\n", buff);
 	itoa(primary_volume_m.block_size, buff, 10);
 	printf("block size: %s\n", buff);
-
+	printf("volume name: %s\n", primary_volume_m.volume_name);
+	printf("mount dir: %s\n", primary_volume_m.mount_dir);
+	itoa(primary_volume_m.root_inode_index, buff, 10);
+	printf("root inode index: %s\n", buff);
+	itoa(primary_volume_m.inode_size, buff, 10);
+	printf("root inode size: %s\n", buff);
+	
 	free_vga();
 	free_stdout();
 	free_bcfs();

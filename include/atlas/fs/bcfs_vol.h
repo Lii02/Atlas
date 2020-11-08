@@ -33,7 +33,7 @@ typedef struct
 	};	
 
 	int16_t sig;
-	int16_t state;
+	int16_t fs_state;
 	int16_t error_comp;
 	int32_t inode_count;
 	int32_t block_count;
@@ -48,6 +48,11 @@ typedef struct
 	int32_t posix_mount;
 	int32_t posix_write;
 	int32_t posix_inspection;
+	int32_t num_writes_before;
+	int32_t num_writes_last;
+	int32_t fs_allocated_blocks;
+	char volume_name[16];
+	char mount_dir[64];
 	char unused0[886];
 } bcfs_volume_t;
 

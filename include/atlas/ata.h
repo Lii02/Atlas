@@ -17,12 +17,13 @@
 #define ATA_REG_LBA0 0x3
 #define ATA_REG_LBA1 0x4
 #define ATA_REG_LBA2 0x5
-#define ATA_REG_LBA3 0x6
 #define ATA_REG_DEVSEL 0x6
 #define ATA_REG_ALTSTATUS 0x0C
 #define ATA_REG_STATUS 0x7
 #define ATA_REG_COMMAND 0x7
+#define ATA_REG_FEATURE 0x1
 #define ATA_CMD_READ_PIO 0x20
+#define ATA_READ_SECTORS 0x24
 
 #define ATA_CMD_IDENTIFY 0xEC
 
@@ -66,8 +67,7 @@ struct ata_device_t
 	struct ata_identity_t identity;
 	int32_t status;
 	int8_t type;
-	int8_t precedence;
-	void (*read)(uint8_t*, uint32_t, uint32_t, struct ata_device_t*);
+	int8_t precedence;	
 };
 
 struct ata_device_t ata_primary_master;
@@ -80,7 +80,7 @@ int ata_detect_device(struct ata_device_t* dev, int8_t prec, int8_t type);
 void ata_io_wait(struct ata_device_t* dev);
 void ata_soft_reset(struct ata_device_t* dev);
 void ata_init_device(struct ata_device_t* dev);
-bool ata_read_sector(uint8_t* buff, uint32_t lba, struct ata_device_t* dev);
-void ata_read_sectors(uint8_t* buff, uint32_t lba, uint32_t sects, struct ata_device_t* dev);
+bool ata_read_sector(uint8_t* buff, uint64_t lba, struct ata_device_t* dev);
+void ata_read_sectors(uint8_t* buff, uint64_t lba, uint32_t sects, struct ata_device_t* dev);
 
 #endif

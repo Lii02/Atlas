@@ -30,11 +30,9 @@ void ata_initialize()
 	initialize_interrupt(HDD2_IRQ, hdd_irq_s);
 
 	ata_detect_device(&ata_primary_master, ATA_PRIMARY, ATA_MASTER);
-	ata_primary_master.read = ata_read_sectors;
 	ata_io_wait(&ata_primary_master);
 
-	ata_detect_device(&ata_primary_slave, ATA_SECONDARY, ATA_SLAVE);
-	ata_primary_slave.read = ata_read_sectors;
+	ata_detect_device(&ata_primary_slave, ATA_SECONDARY, ATA_SLAVE);	
 	ata_io_wait(&ata_primary_slave);
 }
 
@@ -89,11 +87,7 @@ void ata_init_device(struct ata_device_t* dev)
 	CPUOUTB(dev->base + 1, 1);
 	CPUOUTB(dev->control, 0);
 	CPUOUTB(dev->base + ATA_REG_DEVSEL, 0xA0 | (dev->slave << 4));
-	ata_io_wait(dev);
-
 	CPUOUTB(dev->base + ATA_REG_COMMAND, ATA_CMD_IDENTIFY);
-	ata_io_wait(dev);
-
 	int32_t status = CPUINB(dev->base + ATA_REG_COMMAND);
 	dev->status = status;
 	ata_io_wait(dev);
@@ -104,7 +98,6 @@ void ata_init_device(struct ata_device_t* dev)
 	{
 		buff[i] = CPUINW(dev->base);
 	}
-	ata_io_wait(dev);
 
 	uint8_t* ptr = (uint8_t*)&dev->identity.model;
 	for (int i = 0; i < 39; i += 2)
@@ -115,38 +108,13 @@ void ata_init_device(struct ata_device_t* dev)
 	}
 }
 
-bool ata_read_sector(uint8_t* buff, uint32_t lba, struct ata_device_t* dev)
+bool ata_read_sector(uint8_t* buff, uint64_t lba, struct ata_device_t* dev)
 {
-	uint8_t cmd = (dev->type == ATA_MASTER ? 0xE0 : 0xF0);
-	uint8_t slavebit = (dev->type == ATA_MASTER ? ATA_MASTER : ATA_SLAVE);
+	int slavebit = dev->slave;
 
-	CPUOUTB(dev->base + ATA_REG_DEVSEL, (cmd | (uint8_t)((lba >> 24 & 0x0F))));
-	ata_io_wait(dev);
-	CPUOUTB(dev->base + 1, 0x00);
-	ata_io_wait(dev);
-	CPUOUTB(dev->base + ATA_REG_SECCOUNT0, 0x1);
-	ata_io_wait(dev);
-	CPUOUTB(dev->base + ATA_REG_LBA0, (uint8_t)lba);
-	CPUOUTB(dev->base + ATA_REG_LBA1, (uint8_t)(lba >> 8));
-	CPUOUTB(dev->base + ATA_REG_LBA2, (uint8_t)(lba >> 16));
-
-	CPUOUTB(dev->base + ATA_REG_COMMAND, ATA_CMD_READ_PIO);
-	ata_io_wait(dev);
-
-	for(int i = 0; i < 512; i++)
-	{
-		uint16_t data = CPUINB(dev->base + ATA_REG_DATA);
-		*(uint16_t *)(buff + i * 2) = data;
-	}
-	ata_io_wait(dev);
-	return true;
+	CPUOUTB(0x1F6, 0xE0 | (slavebit << 4) | ((lba >> 24) & 0x0F));
 }
 
-void ata_read_sectors(uint8_t* buff, uint32_t lba, uint32_t sects, struct ata_device_t* dev)
+void ata_read_sectors(uint8_t* buff, uint64_t lba, uint32_t sects, struct ata_device_t* dev)
 {
-	for(int i = 0; i < sects; i++)
-	{
-		ata_read_sector(buff, lba + i, dev);
-		ata_io_wait(dev);
-	}
 }
