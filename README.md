@@ -1,5 +1,5 @@
 # Atlas
-Alpha build of the Atlas Operating System. Still working on bootloader and kernel functionality. The operating system itself supports a basic command line VGA terminal (almost complete). The generated image file for the operating system is formatted under a custom (BCFS) filesystem. This operating system is in no way considered complete, and is currently under heavy development.
+Alpha build of the Atlas Operating System. Still working on bootloader and kernel functionality. The generated image file for the operating system is formatted under a custom (BCFS) filesystem. This operating system is in no way considered complete, and is currently under heavy development.
 
 ## Getting Started
 The following steps will serve as a guide for setting up and running the Atlas operating system on a linux machine.
@@ -32,12 +32,10 @@ Run Debugger:
 ```bochs```
 
 Full Build and Test:
-```make```
-```bash exec.sh```
+```make, bash exec.sh```
 
 Full Build and Run Step Debugger:
-```make```
-```bochs```
+```make, bochs```
 
 ## Configuring and Developing Operating System
 The following steps describe the process of modifying or configuring the operating system to run as desired.

@@ -1,3 +1,6 @@
 bcfs/
 img/
 bochsout.txt
+*.o
+*.elf
+*.a
