@@ -45,8 +45,7 @@ void kernel_main()
 	itoa(primary_volume_m.root_inode_index, buff, 10);
 	printf("root inode index: %s\n", buff);
 	itoa(primary_volume_m.inode_size, buff, 10);
-	printf("root inode size: %s\n", buff);
-	
+	printf("root inode size: %s\n", buff);	
 	free_vga();
 	free_stdout();
 	free_bcfs();

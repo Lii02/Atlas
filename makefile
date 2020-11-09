@@ -20,10 +20,16 @@ CFLAGS := -Wall -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32
 #                  ||
 #                  ||
 # Insert here      \/
-all: bcfs/libc.al bcfs/kernel.sys bcfs/boot.bin img/atlas.img
+all: create_folders bcfs/libc.al bcfs/kernel.sys bcfs/boot.bin img/atlas.img
+
+create_folders:
+	mkdir -p bcfs
+	mkdir -p img
 
 img/atlas.img: bootloader/init.bin
-	bash img.sh
+	rm -f img/atlas.img
+	./mkbcfs/mkbcfs img/atlas.img ./bcfs 1044480
+	dd status=noxfer conv=notrunc if=bootloader/init.bin of=img/atlas.img || exit
 
 bootloader/init.bin:
 	$(MAKE) -C bootloader/ init.bin
@@ -36,11 +42,6 @@ bcfs/libc.al:
 
 bcfs/kernel.sys:
 	$(MAKE) -C kernel/ ../bcfs/kernel.sys
-
-clearsrc:
-	$(MAKE) -C bootloader/ clear
-	$(MAKE) -C kernel/ clear
-	$(MAKE) -C libc/ clear
 
 clear:
 	$(RM) -f bcfs/*.sys

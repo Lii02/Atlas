@@ -28,7 +28,8 @@ void init_volume_params(uint_64 volume_size, const std::string& mount_dir)
    volume.inspect_POSIX = get_POSIX_time();
    volume.state = 0;
    volume.compensation = 0;
-   strncpy((int_8*) volume.volume_name, "BCFSDefault", (sizeof(volume.volume_name) - 1) / sizeof(volume.volume_name[0]));
+   // one partition for now
+   strncpy((int_8*) volume.volume_name, "part0", (sizeof(volume.volume_name) - 1) / sizeof(volume.volume_name[0]));
    volume.volume_name[(sizeof(volume.volume_name) - 1) / sizeof(volume.volume_name[0])] = 0;
    strncpy((int_8*) volume.mount_dir, mount_dir.c_str(), (sizeof(volume.mount_dir) - 1) / sizeof(volume.mount_dir[0]));
    volume.mount_dir[(sizeof(volume.mount_dir) - 1) / sizeof(volume.mount_dir[0])] = 0;
