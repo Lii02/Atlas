@@ -1,4 +1,4 @@
-#include <atlas/vga/vga.h>
+#include <atlas/vga.h>
 #include <atlas/i386/i386asm.h>
 #include <atlas/asm/irq.h>
 #include <libc/stdio.h>
@@ -7,6 +7,8 @@
 #include <atlas/fs/vfs.h>
 #include <libc/string.h>
 #include <libc/malloc.h>
+
+#include <atlaslib/tree.h>
 
 #define WIDTH 80
 #define HEIGHT 25
@@ -26,26 +28,9 @@ void kernel_main()
 	
 	puts("printf test\n");
 
-	printf("%s\n", primary_volume_m.ata_device->identity.model);
-	char buff[8];
-	itoa(primary_volume_m.sig, buff, 10);
-	printf("signature: %s\n", buff);
-	itoa(primary_volume_m.inode_count, buff, 10);
-	printf("inode count: %s\n", buff);
-	itoa(primary_volume_m.major_version, buff, 10);
-	printf("major: %s\n", buff);
-	itoa(primary_volume_m.minor_version, buff, 10);
-	printf("minor: %s\n", buff);
-	itoa(primary_volume_m.block_count, buff, 10);
-	printf("block count: %s\n", buff);
-	itoa(primary_volume_m.block_size, buff, 10);
-	printf("block size: %s\n", buff);
-	printf("volume name: %s\n", primary_volume_m.volume_name);
-	printf("mount dir: %s\n", primary_volume_m.mount_dir);
-	itoa(primary_volume_m.root_inode_index, buff, 10);
-	printf("root inode index: %s\n", buff);
-	itoa(primary_volume_m.inode_size, buff, 10);
-	printf("root inode size: %s\n", buff);	
+	tree_t* test_tree = create_tree();
+
+	free_tree(test_tree);
 	free_vga();
 	free_stdout();
 	free_bcfs();

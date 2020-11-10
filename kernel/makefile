@@ -16,7 +16,7 @@ OBJS = \
 kernel.o \
 kernel_main.o \
 i386/i386asm.o \
-vga/vga.o \
+vga.o \
 fs/bcfs_inode.o \
 fs/bcfs_vol.o \
 asm/irqbackend.o \
@@ -52,7 +52,6 @@ clean:
 	$(RM) -f *.o
 	$(RM) -f *.elf
 	$(RM) -f i386/*.o
-	$(RM) -f vga/*.o
 	$(RM) -f fs/*.o
 	$(RM) -f asm/*.o
 
@@ -83,8 +82,8 @@ i386/i386asm.o: i386/i386asm.c
 
 # VGA code
 
-vga/vga.o: vga/vga.c
-	$(CC) $(CFLAGS) -o vga/vga.o -c vga/vga.c 
+vga.o: vga.c
+	$(CC) $(CFLAGS) -o vga.o -c vga.c 
 
 # BCFS filesystem code
 

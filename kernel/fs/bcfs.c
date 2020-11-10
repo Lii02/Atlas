@@ -46,6 +46,8 @@ void init_pvolume()
 	primary_volume_m.bad_block_index = VGET_INT(130);
 	primary_volume_m.unallocated_count = VGET_INT(134);
 	// 886 bytes are reserved
+	
+	memset(&primary_volume_s, 0x0, sizeof(bcfs_volume_t));
 }
 
 void init_bcfs()

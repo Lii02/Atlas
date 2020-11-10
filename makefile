@@ -20,7 +20,7 @@ CFLAGS := -Wall -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32
 #                  ||
 #                  ||
 # Insert here      \/
-all: create_folders bcfs/libc.al bcfs/kernel.sys bcfs/boot.bin img/atlas.img
+all: create_folders bcfs/libc.al bcfs/atlaslib.al bcfs/kernel.sys bcfs/boot.bin img/atlas.img
 
 create_folders:
 	mkdir -p bcfs
@@ -43,10 +43,14 @@ bcfs/libc.al:
 bcfs/kernel.sys:
 	$(MAKE) -C kernel/ ../bcfs/kernel.sys
 	
+bcfs/atlaslib.al:
+	$(MAKE) -C atlaslib/ ../bcfs/atlaslib.al
+	
 clean:
 	$(MAKE) -C bootloader/ clean
 	$(MAKE) -C kernel/ clean
 	$(MAKE) -C libc/ clean
+	$(MAKE) -C atlaslib/ clean
 	$(RM) -f bcfs/*.sys
 	$(RM) -f bcfs/*.bin
 	$(RM) -f bcfs/*.al
