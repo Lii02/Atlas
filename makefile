@@ -42,13 +42,12 @@ bcfs/libc.al:
 
 bcfs/kernel.sys:
 	$(MAKE) -C kernel/ ../bcfs/kernel.sys
-
-clear:
+	
+clean:
+	$(MAKE) -C bootloader/ clean
+	$(MAKE) -C kernel/ clean
+	$(MAKE) -C libc/ clean
 	$(RM) -f bcfs/*.sys
 	$(RM) -f bcfs/*.bin
 	$(RM) -f bcfs/*.al
 	$(RM) -f img/*.img
-	$(RM) -f libc/*.al
-	$(MAKE) -C bootloader/ clear
-	$(MAKE) -C kernel/ clear
-	$(MAKE) -C libc/ clear

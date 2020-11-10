@@ -4,67 +4,79 @@
 #define HDD_IRQ IRQ14
 #define HDD2_IRQ IRQ15
 
+#define ATA_PRIMARY_IO 0x1F0
+#define ATA_SECONDARY_IO 0x170
+
+#define ATA_IRQ1 14
+#define ATA_IRQ2 15
+
 char drive_id = '0';
 
-void hdd_irq_m(cpuregisters_t reg)
+void hdd_irqp(cpuregisters_t regs)
 {
-	CPUINB(ata_primary_master.base + ATA_REG_STATUS);
+	CPUINB(ATA_PRIMARY_IO + ATA_REG_STATUS);
 }
 
-void hdd_irq_s(cpuregisters_t reg)
+void hdd_irqs(cpuregisters_t regs)
 {
-	CPUINB(ata_primary_slave.base + ATA_REG_STATUS);
+	CPUINB(ATA_SECONDARY_IO + ATA_REG_STATUS);
 }
+
 
 void ata_initialize()
 {
-	ata_primary_master.base = 0x1F0;
+	initialize_interrupt(ATA_IRQ1, hdd_irqp);
+	initialize_interrupt(ATA_IRQ2, hdd_irqs);
+
+	ata_primary_master.base = ATA_PRIMARY_IO;
 	ata_primary_master.control = 0x3F6;
-	ata_primary_master.slave = 0;
+	ata_primary_master.slave = ATA_MASTER;
 
-	ata_primary_slave.base = 0x1F0;
+	ata_primary_slave.base = ATA_PRIMARY_IO;
 	ata_primary_slave.control = 0x3F6;
-   	ata_primary_slave.slave = 1;
+   	ata_primary_slave.slave = ATA_SLAVE;
 
-	initialize_interrupt(HDD_IRQ, hdd_irq_m);
-	initialize_interrupt(HDD2_IRQ, hdd_irq_s);
-
-	ata_detect_device(&ata_primary_master, ATA_PRIMARY, ATA_MASTER);
+	ata_detect_device(&ata_primary_master);
 	ata_io_wait(&ata_primary_master);
 
-	ata_detect_device(&ata_primary_slave, ATA_SECONDARY, ATA_SLAVE);	
+	ata_detect_device(&ata_primary_slave);	
 	ata_io_wait(&ata_primary_slave);
 }
 
-int ata_detect_device(struct ata_device_t* dev, int8_t prec, int8_t type)
+void ide_select_drive(struct ata_device_t* dev)
+{
+	if(dev->slave)
+	{
+		CPUOUTB(dev->base + ATA_REG_DEVSEL, 0xB0);
+	}
+	else
+	{
+		CPUOUTB(dev->base + ATA_REG_DEVSEL, 0xA0);
+	}
+}
+
+int ata_detect_device(struct ata_device_t* dev)
 {
 	ata_soft_reset(dev);
+	ide_select_drive(dev);
 	ata_io_wait(dev);
-	CPUOUTB(dev->base + ATA_REG_DEVSEL, 0xA0 | (dev->slave << 4));
-	ata_io_wait(dev);
-	dev->precedence = prec;
-	dev->type = type;
 
 	uint8_t cl = CPUINB(dev->base + ATA_REG_LBA1);
 	uint8_t ch = CPUINB(dev->base + ATA_REG_LBA2);
+
 	if(cl == 0xFF && ch == 0xFF)
 	{
-		return 0;
+		return false;
 	}
 	else if((cl == 0x0 && ch == 0x0) || (cl == 0x3C || ch == 0xC3))
 	{
-		// ATA device/SATA device
-		dev->drivename = strcat("part", &drive_id);
+		dev->drivename = strcat("part", &(drive_id));
 		dev->index = drive_id;
-
-		// Init filesystem/mount here
 		ata_init_device(dev);
-		
 		drive_id++;
-		return 1;
 	}
-
-	return 0;
+	
+	return false;
 }
 
 void ata_io_wait(struct ata_device_t* dev)
@@ -77,44 +89,95 @@ void ata_io_wait(struct ata_device_t* dev)
 void ata_soft_reset(struct ata_device_t* dev)
 {
 	CPUOUTB(dev->control, 0x4);
-	ata_io_wait(dev);
 	CPUOUTB(dev->control, 0x0);
 	ata_io_wait(dev);
 }
 
 void ata_init_device(struct ata_device_t* dev)
 {
-	CPUOUTB(dev->base + 1, 1);
-	CPUOUTB(dev->control, 0);
-	CPUOUTB(dev->base + ATA_REG_DEVSEL, 0xA0 | (dev->slave << 4));
-	CPUOUTB(dev->base + ATA_REG_COMMAND, ATA_CMD_IDENTIFY);
-	int32_t status = CPUINB(dev->base + ATA_REG_COMMAND);
-	dev->status = status;
+	ide_select_drive(dev);
 	ata_io_wait(dev);
 
-	uint16_t* buff = (uint16_t*)&dev->identity;
+	CPUOUTB(dev->base + ATA_REG_SECCOUNT0, 0);
+	CPUOUTB(dev->base + ATA_REG_LBA0, 0);
+	CPUOUTB(dev->base + ATA_REG_LBA1, 0);
+	CPUOUTB(dev->base + ATA_REG_LBA2, 0);
+	CPUOUTB(dev->base + ATA_REG_COMMAND, ATA_CMD_IDENTIFY);
 
-	for (int i = 0; i < 256; ++i)
-	{
-		buff[i] = CPUINW(dev->base);
-	}
+	int8_t status = CPUINB(dev->base + ATA_CMD_IDENTIFY);
+	dev->status = status;
 
-	uint8_t* ptr = (uint8_t*)&dev->identity.model;
-	for (int i = 0; i < 39; i += 2)
+	if(status)
 	{
-		uint8_t tmp = ptr[i + 1];
-		ptr[i + 1] = ptr[i];
-		ptr[i] = tmp;
+		while(CPUINB(dev->base + ATA_REG_STATUS) & ATA_SR_BSY != 0) ;
+pm_stat_read:		status = CPUINB(dev->base + ATA_REG_STATUS);
+		if(status & ATA_SR_ERR)
+		{
+			return;
+		}
+		while(!(status & ATA_SR_DRQ)) goto pm_stat_read;
+
+		int16_t* ibuff = (int16_t*)&dev->identity;
+		for(int i = 0; i < 256; i++)
+		{
+			ibuff[i] = CPUINW(dev->base);
+		}
+
+		uint8_t* mptr = (uint8_t*)&dev->identity.model;
+		for (int i = 0; i < 39; i += 2)
+		{
+			uint8_t tmp = mptr[i + 1];
+			mptr[i + 1] = mptr[i];
+			mptr[i] = tmp;
+		}
 	}
 }
 
-bool ata_read_sector(uint8_t* buff, uint64_t lba, struct ata_device_t* dev)
+void ide_poll(struct ata_device_t* dev)
 {
-	int slavebit = dev->slave;
+	ata_io_wait(dev);
 
-	CPUOUTB(0x1F6, 0xE0 | (slavebit << 4) | ((lba >> 24) & 0x0F));
+	retry:;
+	uint8_t status = CPUINB(dev->base + ATA_REG_STATUS);
+	if(status & ATA_SR_BSY) goto retry;
+retry2:	status = CPUINB(dev->base + ATA_REG_STATUS);
+	if(status & ATA_SR_ERR)
+	{
+		//panic("device failure!\n");
+	}
+	if(!(status & ATA_SR_DRQ)) goto retry2;
+	return;
 }
 
-void ata_read_sectors(uint8_t* buff, uint64_t lba, uint32_t sects, struct ata_device_t* dev)
+bool ata_read_sector(uint8_t* buff, uint32_t lba, struct ata_device_t* dev)
 {
+	ide_select_drive(dev);
+	ata_io_wait(dev);
+
+	CPUOUTB(dev->base + ATA_REG_SECCOUNT0, dev->identity.sectors_28);
+
+	CPUOUTB(dev->base + ATA_REG_LBA0, (uint8_t)lba);
+	CPUOUTB(dev->base + ATA_REG_LBA1, (uint8_t)(lba >> 8));
+	CPUOUTB(dev->base + ATA_REG_LBA2, (uint8_t)(lba >> 16));
+
+	CPUOUTB(dev->base + ATA_REG_COMMAND, ATA_CMD_READ_PIO);
+
+	ide_poll(dev);
+
+	for(int i = 0; i < 256; i++)
+	{
+		uint16_t data = CPUINW(dev->base + ATA_REG_DATA);
+		*(uint16_t*)(buff + i * 2) = data;
+	}
+	ide_poll(dev);
+	return true;
+}
+
+void ata_read_sectors(uint8_t* buff, uint32_t lba, int32_t num, struct ata_device_t* dev)
+{
+	for(int i = 0; i < num; i++)
+	{
+		ata_read_sector(buff, lba + i, dev);
+		buff += 512;
+	}
 }

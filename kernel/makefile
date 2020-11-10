@@ -48,7 +48,7 @@ LINK_LIST = \
 # IMPORTANT! Add all new module C/S files to this dependency list and to the compile list
 # on the kernel.elf line.
 
-clear:
+clean:
 	$(RM) -f *.o
 	$(RM) -f *.elf
 	$(RM) -f i386/*.o

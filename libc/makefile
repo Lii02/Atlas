@@ -40,7 +40,7 @@ LINK_LIST = \
 # IMPORTANT! Add all new module C/S files to this dependency list and to the compile list
 # on the libc.a line.
 
-clear:
+clean:
 	$(RM) -f *.o
 	$(RM) -f *.a
 

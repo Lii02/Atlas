@@ -16,7 +16,7 @@ CFLAGS := -Wall -fno-builtin -fno-pie -nostdlib -ffreestanding -nostdinc -m32
 # modules/FILENAME.o: modules/FILENAME.s
 # 	$(AS) --32 -o modules/FILENAME.o modules/FILENAME.s
 
-clear:
+clean:
 	$(RM) -f *.o
 	$(RM) -f *.elf
 	$(RM) -f *.bin

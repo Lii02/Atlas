@@ -12,6 +12,24 @@
 #define ATA_MASTER 0x0
 #define ATA_SLAVE 0x1
 
+#define ATA_SR_BSY 0x80
+#define ATA_SR_DRDY 0x40
+#define ATA_SR_DF 0x20
+#define ATA_SR_DSC 0x10
+#define ATA_SR_DRQ 0x08
+#define ATA_SR_CORR 0x04
+#define ATA_SR_IDX 0x02
+#define ATA_SR_ERR 0x01
+
+#define ATA_ER_BBK 0x80
+#define ATA_ER_UNC 0x40
+#define ATA_ER_MC 0x20
+#define ATA_ER_IDNF 0x10
+#define ATA_ER_MCR 0x08
+#define ATA_ER_ABRT 0x04
+#define ATA_ER_TK0NF 0x02
+#define ATA_ER_AMNF 0x01
+
 #define ATA_REG_DATA 0x0
 #define ATA_REG_SECCOUNT0 0x2
 #define ATA_REG_LBA0 0x3
@@ -65,22 +83,19 @@ struct ata_device_t
 	char* drivename;
 	int8_t index;
 	struct ata_identity_t identity;
-	int32_t status;
-	int8_t type;
-	int8_t precedence;	
+	int8_t status;	
 };
 
 struct ata_device_t ata_primary_master;
 struct ata_device_t ata_primary_slave;
 
-void hdd_irq_m(cpuregisters_t reg);
-void hdd_irq_s(cpuregisters_t reg);
 void ata_initialize();
-int ata_detect_device(struct ata_device_t* dev, int8_t prec, int8_t type);
+int ata_detect_device(struct ata_device_t* dev);
 void ata_io_wait(struct ata_device_t* dev);
 void ata_soft_reset(struct ata_device_t* dev);
 void ata_init_device(struct ata_device_t* dev);
-bool ata_read_sector(uint8_t* buff, uint64_t lba, struct ata_device_t* dev);
-void ata_read_sectors(uint8_t* buff, uint64_t lba, uint32_t sects, struct ata_device_t* dev);
+void ide_select_drive(struct ata_device_t* dev);
+bool ata_read_sector(uint8_t* buff, uint32_t lba, struct ata_device_t* dev);
+void ata_read_sectors(uint8_t* buff, uint32_t lba, int32_t num, struct ata_device_t* dev);
 
 #endif
