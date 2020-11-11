@@ -9,9 +9,8 @@ size_t strlen(const char* str)
 
 void itoa(int32_t n, char* str, uint32_t radix)
 {
-	int i, sign;
-	
-	i = 0;
+	int i = 0, sign;
+
     if ((sign = n) < 0) n = -n;
     do
 	{

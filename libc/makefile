@@ -50,7 +50,7 @@ all: ../bcfs/libc.al
 	objcopy -O binary libc.a ../bcfs/libc.al
 
 libc.a: $(OBJS)
-	$(LD) -m elf_i386 -o libc.a $(LINK_LIST)
+	$(LD) -static -m elf_i386 -o libc.a $(LINK_LIST)
 
 stdio.o: stdio.c
 	$(CC) $(CFLAGS) -o stdio.o -c stdio.c

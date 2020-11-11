@@ -140,24 +140,6 @@ void vga_puts(char* str)
 
 void vga_scroll(uint32_t count)
 {
-	int i, x, y;
-	for(i = 0; i < count; i++)
-	{
-		for(y = 0; y < kvga->height - 1; y++)
-		{
-			for(x = 0; x < kvga->width; x++) vga_writeptr(vga_read_char(x, y + 1), x, y);	
-		}
-	}
-	for(x = 0; x < kvga->width; x++) vga_writeptr(' ', x, kvga->height - 1);
-
-	if(count > kvga->cursor_y) 
-	{
-		VGA_SET_CURSOR(kvga, 0, 0);
-	}
-	else
-	{
-		VGA_SET_CURSOR(kvga, kvga->cursor_x, kvga->cursor_y - 1)
-	}
 }
 
 char vga_read_char(uint32_t x, uint32_t y)

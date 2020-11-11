@@ -27,7 +27,7 @@ start:							# Called from bootloader; initiates kernel
 # Kernel .BSS Stack Section
 
 .section .bss					# Stack section
-	.lcomm buff, 0x1000				# Reserve 4KB
+	.lcomm buff, 0x2000				# Reserve 8KB
     
 sys_stack:						# Label marks the start of the kernel stack
 

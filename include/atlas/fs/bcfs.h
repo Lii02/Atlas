@@ -8,6 +8,7 @@
 #define BCFS_SECTOR_SIZE 512
 
 #define DEVICE0_ID '0'
+#define BCFS_VOLUME_BLOCK 3
 
 // Only works for ATA, for now...
 bcfs_volume_t primary_volume_m;

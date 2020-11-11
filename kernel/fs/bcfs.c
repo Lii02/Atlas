@@ -2,21 +2,20 @@
 #include <libc/malloc.h>
 #include <libc/string.h>
 
+void init_pvolume()
+{
 #ifdef I386
 #define VGET_BYTE(x) (descriptor[x])
 #define VGET_SHORT(x) (descriptor[x] | (descriptor[x + 1] << 8))
 #define VGET_INT(x) (descriptor[x] | (descriptor[x + 1] << 8) | (descriptor[x + 2] << 16) | (descriptor[x + 3] << 24))
 #endif
-
-void init_pvolume()
-{
 	memset(&primary_volume_m, 0x0, sizeof(bcfs_volume_t));
 	primary_volume_m.dtype = ATA;
 	primary_volume_m.ata_device = &ata_primary_master;
 
-	//INFO: Lookat desc.txt for volume descriptor info
+	//INFO: Look at desc.txt for volume descriptor info
 	uint8_t descriptor[1024];
-	ata_read_sectors(descriptor, 3, 2, &ata_primary_master);
+	ata_read_sectors(descriptor, BCFS_VOLUME_BLOCK, 2, &ata_primary_master);
 	
 	primary_volume_m.sig = VGET_SHORT(0);
 	primary_volume_m.inode_count = VGET_INT(2);
@@ -48,6 +47,10 @@ void init_pvolume()
 	// 886 bytes are reserved
 	
 	memset(&primary_volume_s, 0x0, sizeof(bcfs_volume_t));
+
+#undef VGET_BYTE
+#undef VGET_SHORT
+#undef VGET_INT
 }
 
 void init_bcfs()

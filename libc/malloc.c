@@ -1,7 +1,7 @@
 #include <libc/malloc.h>
 
-static memheader_t *head, *tail;
-static uintptr_t current_brk = 0;
+memheader_t *head, *tail;
+uintptr_t current_brk;
 
 static void* sbrk(uintptr_t i)
 {
@@ -87,3 +87,36 @@ void free(void* block)
 	header->s.is_free = true;
 }
 
+void* calloc(size_t num, size_t nsize)
+{
+    size_t size;
+	void* block;
+	if (!num || !nsize)
+		return NULL;
+	size = num * nsize;
+	if (nsize != size / num)
+		return NULL;
+	block = malloc(size);
+	if (!block)
+		return NULL;
+	memset(block, 0, size);
+	return block;
+}
+
+void* realloc(void* block, size_t size)
+{
+    memheader_t* header;
+	void* ret;
+	if (!block || !size)
+		return malloc(size);
+	header = (memheader_t*)block - 1;
+	if (header->s.size >= size)
+		return block;
+	ret = malloc(size);
+	if (ret) {
+		
+		memcpy(ret, block, header->s.size);
+		free(block);
+	}
+	return ret;
+}

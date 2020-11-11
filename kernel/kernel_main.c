@@ -4,11 +4,9 @@
 #include <libc/stdio.h>
 #include <atlas/ata.h>
 #include <atlas/fs/bcfs.h>
-#include <atlas/fs/vfs.h>
 #include <libc/string.h>
 #include <libc/malloc.h>
-
-#include <atlaslib/tree.h>
+#include <atlas/fs/bcfs_inode.h>
 
 #define WIDTH 80
 #define HEIGHT 25
@@ -26,11 +24,9 @@ void kernel_main()
 	clear_vga();
 	vga_disable_cursor();
 	
-	puts("printf test\n");
+	puts("puts test\n");
+	puts("\n");
 
-	tree_t* test_tree = create_tree();
-
-	free_tree(test_tree);
 	free_vga();
 	free_stdout();
 	free_bcfs();
