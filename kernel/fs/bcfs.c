@@ -53,6 +53,17 @@ void init_pvolume()
 #undef VGET_INT
 }
 
+void bcfs_fill_inode_table(bcfs_volume_t* vol, bcfs_table** table, int32_t block, int32_t first_inode)
+{
+	char inode_block[vol->block_size];
+	ata_read_sectors(inode_block, block, 2, &ata_primary_master);
+
+	for(int i = first_inode; i < vol->inode_count; i++)
+	{
+		(*(table))->inodes[i]->link_type = 69;
+	}
+}
+
 void init_bcfs()
 {
 	init_pvolume();

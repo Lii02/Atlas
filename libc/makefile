@@ -16,8 +16,6 @@ OBJS = \
 	stdio.o \
 	malloc.o \
 	string.o \
-	abort.o \
-
 LIBS = -nostdlib
 LINK_LIST = \
 	$(LIBS) \
@@ -60,6 +58,3 @@ string.o: string.c
 	
 malloc.o: malloc.c
 	$(CC) $(CFLAGS) -o malloc.o -c malloc.c
-	
-abort.o: abort.c
-	$(CC) $(CFLAGS) -o abort.o -c abort.c
